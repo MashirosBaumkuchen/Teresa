@@ -1,0 +1,103 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'kotlin-kapt'
+
+android {
+    signingConfigs {
+        config {
+            keyAlias 'teresa'
+            keyPassword 'teresa'
+            storeFile file('../teresa.keystore')
+            storePassword 'teresa'
+        }
+    }
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.jascal.teresa"
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            debuggable true
+            signingConfig signingConfigs.config
+        }
+        release {
+            minifyEnabled false
+            debuggable false
+            signingConfig signingConfigs.config
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
+        }
+    }
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "terese${variant.versionName}_${variant.name}.apk"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+
+    // --------  support  -------
+    implementation rootProject.ext.supportLibs
+
+    // --------  network  -------
+    implementation rootProject.ext.networkLibs
+
+    // --------  rxJava  -------
+    implementation rootProject.ext.rxJavaLibs
+
+    implementation rootProject.ext.otherLibs
+
+    // --------  GlideOkHttp  --------
+    implementation(rootProject.ext.glideOkhttp) {
+        exclude group: 'glide-parent'
+    }
+
+    // --------  APT  -------
+    kapt rootProject.ext.annotationProcessorLibs
+
+    // --------  kotlin  -------
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // --------  leakCanary  --------
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+
+    // --------  Logger  --------
+    implementation 'com.orhanobut:logger:2.1.1'
+
+    // --------  permission  --------
+    implementation 'me.weyye.hipermission:library:1.0.7'
+
+    // ========================================================================
+    // ========================================================================
+
+    // --------  smartRefreshLayout  --------
+    implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.3'
+    implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.0.3'
+
+    implementation project(':multiple-status-view')
+
+    // --------  Banner  --------
+    implementation 'cn.bingoogolapple:bga-banner:2.1.8@aar'
+
+    // -------- player --------
+    implementation 'com.shuyu:GSYVideoPlayer:2.1.1'
+
+
+}
