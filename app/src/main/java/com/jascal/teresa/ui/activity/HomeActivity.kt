@@ -88,7 +88,7 @@ class HomeActivity : BaseActivity() {
         }
         mIndex = position
         transaction.commitAllowingStateLoss()
-    }c
+    }
 
     private fun hideFragments(transaction: FragmentTransaction) {
         mDiscoverFragment?.let { transaction.hide(it) }

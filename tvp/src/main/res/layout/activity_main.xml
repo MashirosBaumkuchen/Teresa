@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <SurfaceView
+        android:id="@+id/mSurfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="216dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <RelativeLayout
+        android:id="@+id/mActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_alignBottom="@id/mSurfaceView"
+        android:background="#33FFFFFF">
+
+        <Button
+            android:id="@+id/mStart"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/btn_bg"
+            android:text="play" />
+
+        <Button
+            android:id="@+id/mPause"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/mStart"
+            android:background="@drawable/btn_bg"
+            android:text="pause" />
+
+        <SeekBar
+            android:id="@+id/mProgress"
+            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@+id/mDuration"
+            android:layout_toRightOf="@id/mPause"
+            android:background="@drawable/btn_bg"
+            android:progressDrawable="@drawable/progress"
+            android:thumb="@drawable/progress_thumb" />
+
+        <TextView
+            android:id="@+id/mDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/btn_bg"
+            android:gravity="center"
+            android:text="1:31:23" />
+    </RelativeLayout>
+
+</RelativeLayout>

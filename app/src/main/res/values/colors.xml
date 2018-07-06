@@ -8,11 +8,8 @@
     <color name="titleColor">#FFFFFF</color>
     <color name="titleColorBlack">#000000</color>
 
-
     <color name="titleColorBg">#55FFFFFF</color>
     <color name="titleColorItem">#000000</color>
     <color name="darkerGray">#aaa</color>
     <color name="color_gray">#9a9a9a</color>
-
-
 </resources>
