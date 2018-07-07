@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/dimen_player_height">
+
+    <SurfaceView
+        android:id="@+id/mSurfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:id="@+id/mActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_action_height"
+        android:layout_gravity="bottom">
+
+        <ImageView
+            android:id="@+id/mStart"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:padding="@dimen/dimen_icon_padding"
+            android:src="@mipmap/ic_action_start" />
+
+        <SeekBar
+            android:id="@+id/mSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@id/mStart"
+            android:layout_toStartOf="@+id/mDuration" />
+
+        <TextView
+            android:id="@+id/mDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toStartOf="@+id/mCollapse"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/dimen_text_padding"
+            android:paddingRight="@dimen/dimen_text_padding"
+            android:text="@string/string_duration_demo" />
+
+        <ImageView
+            android:id="@+id/mCollapse"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:padding="@dimen/dimen_icon_padding"
+            android:src="@mipmap/ic_action_collapse" />
+
+    </RelativeLayout>
+
+</FrameLayout>

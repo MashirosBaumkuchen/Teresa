@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="dimen_player_height">216dp</dimen>
+    <dimen name="dimen_action_height">32dp</dimen>
+    <dimen name="dimen_icon_padding">4dp</dimen>
+    <dimen name="dimen_text_padding">2dp</dimen>
+</resources>

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">tvp</string>
+    <string name="string_duration_demo">13:05/32:12</string>
 </resources>
