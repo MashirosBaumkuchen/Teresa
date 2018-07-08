@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/dimen_player_height">
+    android:layout_height="match_parent">
 
     <SurfaceView
         android:id="@+id/mSurfaceView"
@@ -24,7 +24,7 @@
 
         <SeekBar
             android:id="@+id/mSeekBar"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_toEndOf="@id/mStart"
             android:layout_toStartOf="@+id/mDuration" />

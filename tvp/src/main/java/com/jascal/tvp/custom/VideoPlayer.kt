@@ -1,7 +1,10 @@
 package com.jascal.tvp.custom
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Handler
@@ -10,12 +13,15 @@ import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
+import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
 import java.text.SimpleDateFormat
 import java.util.*
 
-class VideoPlayer : FrameLayout {
+
+class VideoPlayer : FrameLayout, View.OnClickListener {
     private var view: View? = null
     private var mPlayer: MediaPlayer? = null
     private var mSurfaceView: SurfaceView? = null
@@ -32,30 +38,37 @@ class VideoPlayer : FrameLayout {
 
     constructor(context: Context) : super(context) {
         init(context, DEMO_URI)
+        Logger.showLog("    constructor(context: Context) : super(context) {\n")
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         init(context, DEMO_URI)
+        Logger.showLog("    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {\n")
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
         init(context, DEMO_URI)
+        Logger.showLog("    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {\n")
     }
 
     constructor(context: Context, uri: String) : super(context) {
         init(context, uri)
+        Logger.showLog("    constructor(context: Context, uri: String) : super(context) {\n")
     }
 
     constructor(context: Context, attrs: AttributeSet?, uri: String) : super(context, attrs) {
         init(context, uri)
+        Logger.showLog("    constructor(context: Context, attrs: AttributeSet?, uri: String) : super(context, attrs) {\n")
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, uri: String) : super(context, attrs, defStyleAttr) {
         init(context, uri)
+        Logger.showLog("    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, uri: String) : super(context, attrs, defStyleAttr) {\n")
     }
 
     private fun init(context: Context, uri: String) {
-        val layoutId = ResUtil.getLayoutId(context, "activity_main")
+        Logger.showLog("init start")
+        val layoutId = ResUtil.getLayoutId(context, "layout_player")
         view = View.inflate(context, layoutId, this)
         mSurfaceView = findViewById(ResUtil.getId(context, "mSurfaceView"))
         mActionBar = findViewById(ResUtil.getId(context, "mActionBar"))
@@ -69,6 +82,7 @@ class VideoPlayer : FrameLayout {
     }
 
     private fun initPlayer() {
+        Logger.showLog("initPlayer")
         mPlayer = MediaPlayer().apply {
             setDataSource(context, Uri.parse(mUri))
             prepare()
@@ -76,23 +90,17 @@ class VideoPlayer : FrameLayout {
                 it.start()
                 it.isLooping = true
             }
-            setOnVideoSizeChangedListener { _: MediaPlayer, width: Int, height: Int ->
-                view!!.layoutParams.height = height
-                view!!.layoutParams.width = width
-            }
         }
     }
 
     private fun initView() {
+        Logger.showLog("initView")
         mSurfaceView?.let {
             it.holder.addCallback(MediaPlayerCallBack())
         }
 
-        mStart?.let {
-            it.setOnClickListener {
-                changePlayState()
-            }
-        }
+        mStart?.setOnClickListener(this)
+        mCollapse?.setOnClickListener(this)
 
         mDuration?.let {
             it.text = getFormatTime()
@@ -116,9 +124,53 @@ class VideoPlayer : FrameLayout {
                 }
             })
         }
-
         val dThread = DelayThread(100)
         dThread.start()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        if (this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setVideoParams(this.mPlayer!!, isLand = false)
+        } else if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setVideoParams(this.mPlayer!!, isLand = true)
+        }
+    }
+
+    private fun setVideoParams(mediaPlayer: MediaPlayer, isLand: Boolean) {
+        val flLayoutParams = layoutParams
+        val sfLayoutParams = mSurfaceView!!.layoutParams
+
+        val screenWidth = resources.displayMetrics.widthPixels.toFloat()
+        var screenHeight = resources.displayMetrics.widthPixels * 9f / 16f
+
+        (context as Activity).window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (isLand) {
+            screenHeight = resources.displayMetrics.heightPixels.toFloat()
+            (context as Activity).window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        }
+
+        flLayoutParams.width = screenWidth.toInt()
+        flLayoutParams.height = screenHeight.toInt()
+
+        val videoWidth = mediaPlayer.videoWidth
+        val videoHeight = mediaPlayer.videoHeight
+
+        val videoPor = (videoWidth / videoHeight).toFloat()
+        val screenPor = screenWidth / screenHeight
+
+        //16:9    16:12
+        if (screenPor > videoPor) {
+            sfLayoutParams.height = screenHeight.toInt()
+            sfLayoutParams.width = (screenHeight * screenPor).toInt()
+        } else {
+            //16:9  19:9
+            sfLayoutParams.width = screenWidth.toInt()
+            sfLayoutParams.height = (screenWidth / screenPor).toInt()
+        }
+
+        layoutParams = flLayoutParams
+        mSurfaceView!!.layoutParams = sfLayoutParams
     }
 
     private fun changePlayState() {
@@ -139,10 +191,34 @@ class VideoPlayer : FrameLayout {
         return "$currentPosition/$totalTime"
     }
 
+    override fun onClick(view: View?) {
+        when (view!!.id) {
+            ResUtil.getId(context, "mCollapse") -> {
+                Logger.showLog("            ResUtil.getId(context, \"mCollapse\")->{\n")
+                if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    //变成竖屏
+                    (context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+                } else if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    //变成横屏了
+                    (context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+                }
+
+            }
+            ResUtil.getId(context, "mStart") -> {
+                Logger.showLog("            ResUtil.getId(context, \"mStart\") -> {\n")
+                changePlayState()
+            }
+        }
+    }
+
     private var mHandler: Handler = @SuppressLint("HandlerLeak")
     object : Handler() {
         override fun handleMessage(msg: Message) {
             mSeekBar!!.progress = (mPlayer!!.currentPosition)
+            mDuration?.let {
+                it.text = getFormatTime()
+            }
+
         }
     }
 
@@ -169,7 +245,7 @@ class VideoPlayer : FrameLayout {
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
-
+            mPlayer!!.pause()
         }
     }
 
