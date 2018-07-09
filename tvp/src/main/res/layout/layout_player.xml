@@ -9,6 +9,11 @@
         android:layout_height="match_parent" />
 
     <RelativeLayout
+        android:id="@+id/mCover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <RelativeLayout
         android:id="@+id/mActionBar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_action_height"

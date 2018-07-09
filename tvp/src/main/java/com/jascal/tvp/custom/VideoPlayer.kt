@@ -9,11 +9,9 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Handler
 import android.os.Message
+import android.os.Parcelable
 import android.util.AttributeSet
-import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 import android.widget.*
 import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
@@ -26,14 +24,17 @@ class VideoPlayer : FrameLayout, View.OnClickListener {
     private var mPlayer: MediaPlayer? = null
     private var mSurfaceView: SurfaceView? = null
     private var mActionBar: RelativeLayout? = null
+    private var mCover: RelativeLayout? = null
     private var mStart: ImageView? = null
     private var mCollapse: ImageView? = null
     private var mSeekBar: SeekBar? = null
     private var mDuration: TextView? = null
     private var mUri: String? = null
+    private var mCoverImg:View?=null
 
     companion object {
-        private const val DEMO_URI: String = "http://baobab.kaiyanapp.com/api/v1/playUrl?vid=14914&editionType=default&source=ucloud"
+        const val DEMO_URI: String = "http://baobab.kaiyanapp.com/api/v1/playUrl?vid=113514&resourceType=video&editionType=default&source=aliyun"
+        const val DEMO_COVER: String = "http://img.kaiyanapp.com/cbe8ea9ae48ff855ef3d51a16733ede3.png?imageMogr2/quality/60/format/jpg"
     }
 
     constructor(context: Context) : super(context) {
@@ -66,6 +67,13 @@ class VideoPlayer : FrameLayout, View.OnClickListener {
         Logger.showLog("    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, uri: String) : super(context, attrs, defStyleAttr) {\n")
     }
 
+    fun setCover(cover:View){
+        mCover?.let {
+            this.mCoverImg = cover
+            resolveCover(cover)
+        }
+    }
+
     private fun init(context: Context, uri: String) {
         Logger.showLog("init start")
         val layoutId = ResUtil.getLayoutId(context, "layout_player")
@@ -76,6 +84,7 @@ class VideoPlayer : FrameLayout, View.OnClickListener {
         mCollapse = findViewById(ResUtil.getId(context, "mCollapse"))
         mSeekBar = findViewById(ResUtil.getId(context, "mSeekBar"))
         mDuration = findViewById(ResUtil.getId(context, "mDuration"))
+        mCover = findViewById(ResUtil.getId(context, "mCover"))
         mUri = uri
         initPlayer()
         initView()
@@ -87,7 +96,6 @@ class VideoPlayer : FrameLayout, View.OnClickListener {
             setDataSource(context, Uri.parse(mUri))
             prepare()
             setOnPreparedListener {
-                it.start()
                 it.isLooping = true
             }
         }
@@ -99,6 +107,7 @@ class VideoPlayer : FrameLayout, View.OnClickListener {
             it.holder.addCallback(MediaPlayerCallBack())
         }
 
+        mCover?.setOnClickListener(this)
         mStart?.setOnClickListener(this)
         mCollapse?.setOnClickListener(this)
 
@@ -130,12 +139,35 @@ class VideoPlayer : FrameLayout, View.OnClickListener {
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
+        Logger.showLog("    override fun onConfigurationChanged(newConfig: Configuration?) {\n")
         if (this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setVideoParams(this.mPlayer!!, isLand = false)
         } else if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setVideoParams(this.mPlayer!!, isLand = true)
         }
     }
+
+    override fun onSaveInstanceState(): Parcelable {
+        Logger.showLog("onSaveInstanceState in viewPlayer")
+        mPlayer?.let {
+            if (it.isPlaying) {
+                it.pause()
+            }
+        }
+        return super.onSaveInstanceState()
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        Logger.showLog("onRestoreInstanceState in viewPlayer")
+        super.onRestoreInstanceState(state)
+        mPlayer?.let {
+            if (!it.isPlaying) {
+                it.start()
+            }
+        }
+    }
+
+
 
     private fun setVideoParams(mediaPlayer: MediaPlayer, isLand: Boolean) {
         val flLayoutParams = layoutParams
@@ -208,6 +240,22 @@ class VideoPlayer : FrameLayout, View.OnClickListener {
                 Logger.showLog("            ResUtil.getId(context, \"mStart\") -> {\n")
                 changePlayState()
             }
+            ResUtil.getId(context,"mCover")->{
+                Logger.showLog("            ResUtil.getId(context, \"mCover\") -> {\n")
+                mCover?.visibility = View.GONE
+                mPlayer?.start()
+            }
+        }
+    }
+
+    private fun resolveCover(cover:View){
+        mCover?.let {
+            it.removeAllViews()
+            it.addView(cover)
+            val lp:ViewGroup.LayoutParams = cover.layoutParams
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT
+            cover.layoutParams = lp
         }
     }
 

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion 28
 
@@ -36,4 +37,21 @@ dependencies {
 
     // --------  kotlin  -------
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // --------  network  -------
+    implementation rootProject.ext.networkLibs
+
+    // --------  rxJava  -------
+    implementation rootProject.ext.rxJavaLibs
+
+    implementation rootProject.ext.otherLibs
+
+    // --------  GlideOkHttp  --------
+    implementation(rootProject.ext.glideOkhttp) {
+        exclude group: 'glide-parent'
+    }
+
+    // --------  APT  -------
+    kapt rootProject.ext.annotationProcessorLibs
+
 }
