@@ -6,14 +6,14 @@ import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.ImageView
 import com.jascal.teresa.glide.GlideApp
-import com.jascal.tvp.custom.VideoPlayer
 import com.jascal.tvp.utils.Logger
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        private const val DEMO_URI: String = "http://baobab.kaiyanapp.com/api/v1/playUrl?vid=14914&editionType=default&source=ucloud"
+        const val DEMO_URI: String = "http://baobab.kaiyanapp.com/api/v1/playUrl?vid=113514&resourceType=video&editionType=default&source=aliyun"
+        const val DEMO_COVER: String = "http://img.kaiyanapp.com/cbe8ea9ae48ff855ef3d51a16733ede3.png?imageMogr2/quality/60/format/jpg"
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -21,11 +21,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // set uri
+        mViewPlayer.setData(DEMO_URI)
+
         // set cover
         val imageView = ImageView(this)
         imageView.scaleType = ImageView.ScaleType.CENTER_CROP
         GlideApp.with(this)
-                .load(VideoPlayer.DEMO_COVER)
+                .load(DEMO_COVER)
                 .centerCrop()
                 .into(imageView)
         mViewPlayer.setCover(imageView)

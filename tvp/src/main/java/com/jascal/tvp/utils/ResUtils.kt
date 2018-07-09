@@ -31,6 +31,11 @@ object ResUtil {
                 "drawable", paramContext.packageName)
     }
 
+    fun getMipmapId(paramContext: Context, paramString: String): Int {
+        return paramContext.resources.getIdentifier(paramString,
+                "mipmap", paramContext.packageName)
+    }
+
     fun getStyleId(paramContext: Context, paramString: String): Int {
         return paramContext.resources.getIdentifier(paramString,
                 "style", paramContext.packageName)

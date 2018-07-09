@@ -9,7 +9,7 @@
         android:layout_height="match_parent" />
 
     <RelativeLayout
-        android:id="@+id/mCover"
+        android:id="@+id/mCoverContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
@@ -17,6 +17,7 @@
         android:id="@+id/mActionBar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_action_height"
+        android:background="#33000000"
         android:layout_gravity="bottom">
 
         <ImageView
@@ -40,6 +41,7 @@
             android:layout_height="match_parent"
             android:layout_toStartOf="@+id/mCollapse"
             android:gravity="center_vertical"
+            android:textColor="#ffffff"
             android:paddingLeft="@dimen/dimen_text_padding"
             android:paddingRight="@dimen/dimen_text_padding"
             android:text="@string/string_duration_demo" />
@@ -50,7 +52,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:padding="@dimen/dimen_icon_padding"
-            android:src="@mipmap/ic_action_collapse" />
+            android:src="@mipmap/ic_action_expand" />
 
     </RelativeLayout>
 
