@@ -5,7 +5,7 @@ import android.util.Log
 class Logger{
     companion object {
         fun showLog(message:String){
-            Log.d("Logger: ", message)
+            Log.d("Player: ", message)
         }
     }
 }

@@ -45,35 +45,36 @@ class VideoPlayer : FrameLayout, View.OnClickListener, SeekBar.OnSeekBarChangeLi
 
     constructor(context: Context) : super(context) {
         init()
-        Logger.showLog("    constructor(context: Context) : super(context) {\n")
+        Logger.showLog("constructor(context: Context)")
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         init()
-        Logger.showLog("    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {\n")
+        Logger.showLog("constructor(context: Context, attrs: AttributeSet?)")
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
         init()
-        Logger.showLog("    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {\n")
+        Logger.showLog("constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)")
     }
 
     constructor(context: Context, uri: String) : super(context) {
         init(uri)
-        Logger.showLog("    constructor(context: Context, uri: String) : super(context) {\n")
+        Logger.showLog("constructor(context: Context, uri: String)")
     }
 
     constructor(context: Context, attrs: AttributeSet?, uri: String) : super(context, attrs) {
         init(uri)
-        Logger.showLog("    constructor(context: Context, attrs: AttributeSet?, uri: String) : super(context, attrs) {\n")
+        Logger.showLog("constructor(context: Context, attrs: AttributeSet?, uri: String)")
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, uri: String) : super(context, attrs, defStyleAttr) {
         init(uri)
-        Logger.showLog("    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, uri: String) : super(context, attrs, defStyleAttr) {\n")
+        Logger.showLog("constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, uri: String)")
     }
 
     fun setCover(cover: View) {
+        Logger.showLog("setCover")
         this.mCover = cover
     }
 
@@ -139,6 +140,7 @@ class VideoPlayer : FrameLayout, View.OnClickListener, SeekBar.OnSeekBarChangeLi
             it.holder.addCallback(MediaPlayerCallBack())
         }
 
+        mSurfaceView?.setOnClickListener(this)
         mCoverContainer?.setOnClickListener(this)
         mStart?.setOnClickListener(this)
         mCollapse?.setOnClickListener(this)
@@ -221,7 +223,11 @@ class VideoPlayer : FrameLayout, View.OnClickListener, SeekBar.OnSeekBarChangeLi
 
     override fun onSaveInstanceState(): Parcelable {
         Logger.showLog("onSaveInstanceState in viewPlayer")
-        pause()
+        mPlayer?.let {
+            it.pause()
+            mStart!!.setImageResource(ResUtil.getMipmapId(context, ICON_START))
+            mCurrentPosition = it.currentPosition
+        }
         return super.onSaveInstanceState()
     }
 
@@ -229,6 +235,14 @@ class VideoPlayer : FrameLayout, View.OnClickListener, SeekBar.OnSeekBarChangeLi
         Logger.showLog("onRestoreInstanceState in viewPlayer")
         super.onRestoreInstanceState(state)
         play()
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        Logger.showLog("onWindowFocusChanged")
+        super.onWindowFocusChanged(hasWindowFocus)
+        if(hasWindowFocus){
+            mPlayer?.seekTo(mCurrentPosition)
+        }
     }
 
     private fun setVideoParams(mediaPlayer: MediaPlayer, isLand: Boolean) {
@@ -296,17 +310,20 @@ class VideoPlayer : FrameLayout, View.OnClickListener, SeekBar.OnSeekBarChangeLi
     override fun onClick(view: View?) {
         when (view!!.id) {
             ResUtil.getId(context, "mCollapse") -> {
-                Logger.showLog("            ResUtil.getId(context, \"mCollapse\")->{\n")
+                Logger.showLog("ResUtil.getId(context, \"mCollapse\")")
                 changeOrientationState()
             }
             ResUtil.getId(context, "mStart") -> {
-                Logger.showLog("            ResUtil.getId(context, \"mStart\") -> {\n")
+                Logger.showLog("ResUtil.getId(context, \"mStart\")")
                 changePlayState()
             }
             ResUtil.getId(context, "mCoverContainer") -> {
-                Logger.showLog("            ResUtil.getId(context, \"mCover\") -> {\n")
-                mCoverContainer?.visibility = View.GONE
-                play()
+                Logger.showLog("ResUtil.getId(context, \"mCover\")")
+                changePlayState()
+            }
+            ResUtil.getId(context, "mSurfaceView")->{
+                Logger.showLog("ResUtil.getId(context, \"mSurfaceView\")")
+                changePlayState()
             }
         }
     }
