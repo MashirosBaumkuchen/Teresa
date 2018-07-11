@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.AttributeSet
-import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import com.jascal.tvp.utils.Logger
@@ -15,90 +14,92 @@ import com.jascal.tvp.utils.Logger
  * describe base layout of GestureDetector
  */
 @RequiresApi(Build.VERSION_CODES.M)
-abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListener,
-        GestureDetector.OnContextClickListener, GestureDetector.OnDoubleTapListener {
-
-    private var gt: GestureDetector? = null
-
+abstract class VideoPlayerLayout : FrameLayout {
     constructor(context: Context) : super(context) {
         Logger.showLog("motion constructor(context: Context)")
-        initGestureDetector()
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         Logger.showLog("motion constructor(context: Context, attrs: AttributeSet?)")
-        initGestureDetector()
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
         Logger.showLog("motion constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)")
-        initGestureDetector()
     }
 
-    private fun initGestureDetector() {
-//        Logger.showLog("motion initGestureDetector")
-//        gt = GestureDetector(context, this).apply {
-//            setOnDoubleTapListener(this@VideoPlayerLayout)
-//            setContextClickListener(this@VideoPlayerLayout)
-//            setIsLongpressEnabled(false)
-//        }
-//        setOnTouchListener { _, motionEvent ->
-//            gt!!.onTouchEvent(motionEvent)
-//        }
+    /**
+     * if return false: ignore event
+     * if return true: dispatch event to fun onInterceptTouchEvent()
+     */
+    override fun dispatchTouchEvent(motionEvent: MotionEvent?): Boolean {
+        return super.dispatchTouchEvent(motionEvent)
     }
 
-    override fun onShowPress(p0: MotionEvent?) {
-        Logger.showLog("onShowPress")
-    }
+    private var startX = 0f
+    private var startY = 0f
+    private var isActing = false
 
-    override fun onSingleTapUp(p0: MotionEvent?): Boolean {
-        Logger.showLog("onSingleTapUp")
+    /**
+     * if return true: dispatch event to this.onTouchEvent()
+     * if return false: dispatch event to child
+     * */
+    override fun onInterceptTouchEvent(motionEvent: MotionEvent?): Boolean {
+        Logger.showLog("onInterceptTouchEvent")
+        var deltaX = 0f
+        var deltaY = 0f
+        when (motionEvent?.action) {
+            MotionEvent.ACTION_DOWN -> {
+                // reset
+                isActing = false
+                startX = motionEvent.x
+                startY = motionEvent.y
+                requestDisallowInterceptTouchEvent(false)
+            }
+            MotionEvent.ACTION_MOVE -> {
+                deltaX = startX - motionEvent.x
+                deltaY = startY - motionEvent.y
+                if (Math.abs(deltaX) > 100 || Math.abs(deltaY) > 100) {
+                    isActing = true
+                    return true
+                }
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                if (isActing) {
+                    isActing = false
+                    return true
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+                if (isActing) {
+                    isActing = false
+                    return true
+                }
+            }
+        }
         return false
     }
 
-    override fun onDown(p0: MotionEvent?): Boolean {
-        Logger.showLog("onDown")
-        return false
-
+    /**
+     * solve the motionEvent
+     * */
+    override fun onTouchEvent(motionEvent: MotionEvent?): Boolean {
+        Logger.showLog("onTouchEvent")
+        when (motionEvent?.action) {
+            MotionEvent.ACTION_DOWN -> {
+                Logger.showLog("ACTION_DOWN")
+            }
+            MotionEvent.ACTION_MOVE -> {
+                Logger.showLog("ACTION_MOVE")
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                Logger.showLog("ACTION_CANCEL")
+            }
+            MotionEvent.ACTION_UP -> {
+                Logger.showLog("ACTION_UP")
+            }
+        }
+        return super.onTouchEvent(motionEvent)
     }
 
-    override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
-        Logger.showLog("onFling")
-        return false
 
-    }
-
-    override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
-        Logger.showLog("onScroll")
-        return false
-
-    }
-
-    override fun onLongPress(p0: MotionEvent?) {
-        Logger.showLog("onLongPress")
-    }
-
-    override fun onContextClick(p0: MotionEvent?): Boolean {
-        Logger.showLog("onContextClick")
-        return false
-
-    }
-
-    override fun onDoubleTap(p0: MotionEvent?): Boolean {
-        Logger.showLog("onDoubleTap")
-        return false
-
-    }
-
-    override fun onDoubleTapEvent(p0: MotionEvent?): Boolean {
-        Logger.showLog("onDoubleTapEvent")
-        return false
-
-    }
-
-    override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean {
-        Logger.showLog("onSingleTapConfirmed")
-        return false
-
-    }
 }
