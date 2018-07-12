@@ -55,27 +55,15 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
     private val mSimpleDateFormat: SimpleDateFormat by lazy { SimpleDateFormat("mm:ss") }
 
     constructor(context: Context) : super(context) {
-        init()
+        initView()
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init()
+        initView()
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        init()
-    }
-
-    constructor(context: Context, uri: String) : super(context) {
-        init(uri)
-    }
-
-    constructor(context: Context, attrs: AttributeSet?, uri: String) : super(context, attrs) {
-        init(uri)
-    }
-
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, uri: String) : super(context, attrs, defStyleAttr) {
-        init(uri)
+        initView()
     }
 
     fun setCover(cover: View) {
@@ -91,56 +79,31 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
             it.isLooping = true
             it.setOnPreparedListener {
                 mProgress.visibility = View.GONE
-                resolveCover(mCover!!)
-                initData()
+                onPrepared()
             }
         }
     }
 
-    private fun init() {
-        initView()
-        initPlayer()
-    }
-
-    private fun init(uri: String) {
-        initView()
-        initPlayer(uri)
-    }
-
     private fun initView() {
+        mPlayer = MediaPlayer()
+
         val layoutId = ResUtil.getLayoutId(context, "layout_player")
         view = View.inflate(context, layoutId, this)
         mSurfaceView = findViewById(ResUtil.getId(context, "mSurfaceView"))
+        mSurfaceView?.holder?.addCallback(MediaPlayerCallBack())
+
         mActionBar = findViewById(ResUtil.getId(context, "mActionBar"))
         mStart = findViewById(ResUtil.getId(context, "mStart"))
         mCollapse = findViewById(ResUtil.getId(context, "mCollapse"))
         mSeekBar = findViewById(ResUtil.getId(context, "mSeekBar"))
         mDuration = findViewById(ResUtil.getId(context, "mDuration"))
         mCoverContainer = findViewById(ResUtil.getId(context, "mCoverContainer"))
-
-        mSurfaceView?.let {
-            it.holder.addCallback(MediaPlayerCallBack())
-        }
     }
 
-    private fun initPlayer() {
-        mPlayer = MediaPlayer()
-    }
+    override fun onPrepared() {
+        resolveCover(mCover!!)
+        setVideoParams(mPlayer!!, false)
 
-    private fun initPlayer(uri: String) {
-        mUri = uri
-        mPlayer = MediaPlayer().apply {
-            setDataSource(context, Uri.parse(mUri))
-            prepareAsync()
-            isLooping = true
-            setOnPreparedListener {
-                resolveCover(mCover!!)
-                initData()
-            }
-        }
-    }
-
-    private fun initData() {
         mSurfaceView?.setOnClickListener(this)
         mCoverContainer?.setOnClickListener(this)
         mStart?.setOnClickListener(this)
@@ -151,47 +114,9 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
             it.progress = 0
             it.setOnSeekBarChangeListener(this)
         }
+
         val dThread = DelayThread(100)
         dThread.start()
-    }
-
-    private fun updatePlayTime() {
-        mDuration?.let {
-            it.text = getFormatTime()
-        }
-    }
-
-    private fun collapse() {
-        mCollapse?.let {
-            (context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            it.setImageResource(ResUtil.getMipmapId(context, ICON_EXPAND))
-        }
-    }
-
-    private fun expand() {
-        mCollapse?.let {
-            (context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            it.setImageResource(ResUtil.getMipmapId(context, ICON_COLLAPSE))
-        }
-    }
-
-    private fun play() {
-        mCoverContainer?.let {
-            if (it.visibility == View.VISIBLE) {
-                it.visibility = View.GONE
-            }
-        }
-        mPlayer?.let {
-            it.start()
-            mStart!!.setImageResource(ResUtil.getMipmapId(context, ICON_PAUSE))
-        }
-    }
-
-    private fun pause() {
-        mPlayer?.let {
-            it.pause()
-            mStart!!.setImageResource(ResUtil.getMipmapId(context, ICON_START))
-        }
     }
 
     override fun onProgressChanged(seekbar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -238,12 +163,60 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         }
     }
 
+    private fun updatePlayTime() {
+        mDuration?.let {
+            it.text = getFormatTime()
+        }
+    }
+
+    private fun collapse() {
+        mCollapse?.let {
+            (context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            it.setImageResource(ResUtil.getMipmapId(context, ICON_EXPAND))
+        }
+    }
+
+    private fun expand() {
+        mCollapse?.let {
+            (context as Activity).requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            it.setImageResource(ResUtil.getMipmapId(context, ICON_COLLAPSE))
+        }
+    }
+
+    private fun play() {
+        mCoverContainer?.let {
+            if (it.visibility == View.VISIBLE) {
+                it.visibility = View.GONE
+            }
+        }
+        mPlayer?.let {
+            it.start()
+            mStart!!.setImageResource(ResUtil.getMipmapId(context, ICON_PAUSE))
+        }
+    }
+
+    private fun pause() {
+        mPlayer?.let {
+            it.pause()
+            mStart!!.setImageResource(ResUtil.getMipmapId(context, ICON_START))
+        }
+    }
+
+    private var isFirst = true
+    private var por = 0f
     private fun setVideoParams(mediaPlayer: MediaPlayer, isLand: Boolean) {
         val flLayoutParams = layoutParams
         val sfLayoutParams = mSurfaceView!!.layoutParams
 
-        val screenWidth = resources.displayMetrics.widthPixels.toFloat()
-        var screenHeight = resources.displayMetrics.widthPixels * 9f / 16f
+        var screenWidth = resources.displayMetrics.widthPixels.toFloat()
+        var screenHeight = 0f
+        if (isFirst) {
+            screenHeight = layoutParams.height.toFloat()
+            por = screenWidth / screenHeight
+            isFirst = false
+        } else {
+            screenHeight = resources.displayMetrics.widthPixels * 9f / 16f
+        }
 
         (context as Activity).window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         if (isLand) {
@@ -316,6 +289,23 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
             }
         }
     }
+
+    override fun getVideoWidth(): Int {
+        return mSurfaceView!!.layoutParams.width
+    }
+
+    override fun getVideoHeight(): Int {
+        return mSurfaceView!!.layoutParams.height
+    }
+
+    override fun onBrightnessChange(d: Float?) {
+        Logger.showLog("onBrightnessChange, dy = $d")
+    }
+
+    override fun onVolumeChange(d: Float?) {
+        Logger.showLog("onVolumeChange, dy = $d")
+    }
+
 
     private fun resolveCover(cover: View) {
         mCoverContainer?.let {

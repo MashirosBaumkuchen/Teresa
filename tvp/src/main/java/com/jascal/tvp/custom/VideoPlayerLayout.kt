@@ -6,7 +6,6 @@ import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
-import com.jascal.tvp.utils.Logger
 
 /**
  * @author jascal
@@ -15,17 +14,11 @@ import com.jascal.tvp.utils.Logger
  */
 @RequiresApi(Build.VERSION_CODES.M)
 abstract class VideoPlayerLayout : FrameLayout {
-    constructor(context: Context) : super(context) {
-        Logger.showLog("motion constructor(context: Context)")
-    }
+    constructor(context: Context) : super(context)
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        Logger.showLog("motion constructor(context: Context, attrs: AttributeSet?)")
-    }
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        Logger.showLog("motion constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)")
-    }
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     /**
      * if return false: ignore event
@@ -44,7 +37,6 @@ abstract class VideoPlayerLayout : FrameLayout {
      * if return false: dispatch event to child
      * */
     override fun onInterceptTouchEvent(motionEvent: MotionEvent?): Boolean {
-        Logger.showLog("onInterceptTouchEvent")
         var deltaX = 0f
         var deltaY = 0f
         when (motionEvent?.action) {
@@ -83,23 +75,40 @@ abstract class VideoPlayerLayout : FrameLayout {
      * solve the motionEvent
      * */
     override fun onTouchEvent(motionEvent: MotionEvent?): Boolean {
-        Logger.showLog("onTouchEvent")
-        when (motionEvent?.action) {
-            MotionEvent.ACTION_DOWN -> {
-                Logger.showLog("ACTION_DOWN")
-            }
-            MotionEvent.ACTION_MOVE -> {
-                Logger.showLog("ACTION_MOVE")
-            }
-            MotionEvent.ACTION_CANCEL -> {
-                Logger.showLog("ACTION_CANCEL")
-            }
-            MotionEvent.ACTION_UP -> {
-                Logger.showLog("ACTION_UP")
+        motionEvent?.let {
+            when (it.action) {
+                MotionEvent.ACTION_DOWN -> {
+
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val mLayoutWidth = getVideoWidth()
+                    val mLayoutHeight = getVideoHeight()
+
+                    val dy = (startY - it.y) / mLayoutHeight
+                    if (startX > mLayoutWidth * 3.0 / 4) {
+                        onVolumeChange(dy)
+                    } else if (startX < mLayoutWidth / 4.0) {
+                        onBrightnessChange(dy)
+                    }
+
+                    startX = motionEvent.x
+                    startY = motionEvent.y
+                }
+                MotionEvent.ACTION_UP -> {
+
+                }
+                MotionEvent.ACTION_CANCEL -> {
+
+                }
             }
         }
         return super.onTouchEvent(motionEvent)
     }
 
+    abstract fun onPrepared()
+    abstract fun getVideoWidth():Int
+    abstract fun getVideoHeight():Int
+    abstract fun onVolumeChange(d: Float?)
+    abstract fun onBrightnessChange(d: Float?)
 
 }
