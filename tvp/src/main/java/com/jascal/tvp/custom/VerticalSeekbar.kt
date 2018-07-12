@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
 
 /**
@@ -85,6 +84,10 @@ class VerticalSeekBar : View {
         val target = a * percent + b
         this.mProgress = target * 100f
         invalidate()
+    }
+
+    fun setProgress(progress: Float){
+        this.mProgress = progress
     }
 
 }

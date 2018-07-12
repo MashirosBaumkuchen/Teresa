@@ -18,8 +18,6 @@ import android.widget.*
 import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
 import java.text.SimpleDateFormat
-import android.media.AudioManager.FLAG_PLAY_SOUND
-import android.media.AudioManager.STREAM_MUSIC
 import android.content.Context.AUDIO_SERVICE
 import android.media.AudioManager
 
@@ -37,6 +35,8 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         private const val ICON_PAUSE = "ic_action_pause"
         private const val ICON_COLLAPSE = "ic_action_collapse"
         private const val ICON_EXPAND = "ic_action_expand"
+
+        private const val MIN_BRIGHTNESS = 0.2f
     }
 
     private var view: View? = null
@@ -106,7 +106,6 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
 
         mProgress = findViewById(ResUtil.getId(context, "mProgress"))
         mBrightSeekBar = findViewById(ResUtil.getId(context, "mBrightSeekBar"))
-        mBrightSeekBar?.setMin(0.2f)
 
         mVolumeSeekBar = findViewById(ResUtil.getId(context, "mVolumeSeekBar"))
     }
@@ -310,6 +309,7 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
     }
 
     override fun onBrightnessChange(d: Float?) {
+        mBrightSeekBar?.setMin(MIN_BRIGHTNESS)
         val layoutParams = (context as Activity).window.attributes
         layoutParams.screenBrightness = layoutParams.screenBrightness + d!!
         if (layoutParams.screenBrightness > 1) {
@@ -322,24 +322,16 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
     }
 
     override fun onVolumeChange(d: Float?) {
-        Logger.showLog("onVolumeChange, dy = $d")
         val audioManager = (context as Activity).getSystemService(AUDIO_SERVICE) as AudioManager
         var k = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-        Logger.showLog("onVolumeChange, k = $k")
-
         val max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        Logger.showLog("onVolumeChange, max = $max")
-
-        mVolumeSeekBar?.setMax(max.toFloat())
-        k = (k + d!! * max).toInt()
+        k = (k + max * d!!).toInt()
         if (k in 0..max) {
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, k, AudioManager.FLAG_PLAY_SOUND)
-            mVolumeSeekBar?.setProgressByPercent((k / max).toFloat())
-        } else {
-            return
+            mVolumeSeekBar?.setProgressByPercent(((k.toFloat() / max)))
+            Logger.showLog("progress: ${(k.toFloat() / max)}")
         }
     }
-
 
     private fun resolveCover(cover: View) {
         mCoverContainer?.let {
