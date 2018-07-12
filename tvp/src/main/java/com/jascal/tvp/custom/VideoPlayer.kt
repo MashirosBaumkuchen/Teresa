@@ -14,14 +14,15 @@ import android.os.Parcelable
 import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.*
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
 import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
-import kotlinx.android.synthetic.main.layout_player.view.*
 import java.text.SimpleDateFormat
+import android.media.AudioManager.FLAG_PLAY_SOUND
+import android.media.AudioManager.STREAM_MUSIC
+import android.content.Context.AUDIO_SERVICE
+import android.media.AudioManager
+
 
 /**
  * @author jascal
@@ -49,6 +50,10 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
     private var mDuration: TextView? = null
     private var mUri: String? = null
     private var mCover: View? = null
+
+    private var mProgress: ProgressBar? = null
+    private var mBrightSeekBar: VerticalSeekBar? = null
+    private var mVolumeSeekBar: VerticalSeekBar? = null
 
     private var mCurrentPosition = 0
     private var mTotalTime = 0
@@ -78,7 +83,7 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
             it.prepareAsync()
             it.isLooping = true
             it.setOnPreparedListener {
-                mProgress.visibility = View.GONE
+                mProgress?.visibility = View.GONE
                 onPrepared()
             }
         }
@@ -98,6 +103,12 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         mSeekBar = findViewById(ResUtil.getId(context, "mSeekBar"))
         mDuration = findViewById(ResUtil.getId(context, "mDuration"))
         mCoverContainer = findViewById(ResUtil.getId(context, "mCoverContainer"))
+
+        mProgress = findViewById(ResUtil.getId(context, "mProgress"))
+        mBrightSeekBar = findViewById(ResUtil.getId(context, "mBrightSeekBar"))
+        mBrightSeekBar?.setMin(0.2f)
+
+        mVolumeSeekBar = findViewById(ResUtil.getId(context, "mVolumeSeekBar"))
     }
 
     override fun onPrepared() {
@@ -299,11 +310,34 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
     }
 
     override fun onBrightnessChange(d: Float?) {
-        Logger.showLog("onBrightnessChange, dy = $d")
+        val layoutParams = (context as Activity).window.attributes
+        layoutParams.screenBrightness = layoutParams.screenBrightness + d!!
+        if (layoutParams.screenBrightness > 1) {
+            layoutParams.screenBrightness = 1f
+        } else if (layoutParams.screenBrightness < 0.2) {
+            layoutParams.screenBrightness = 0.2f
+        }
+        (context as Activity).window.attributes = layoutParams
+        mBrightSeekBar?.setProgressByPercent(layoutParams.screenBrightness)
     }
 
     override fun onVolumeChange(d: Float?) {
         Logger.showLog("onVolumeChange, dy = $d")
+        val audioManager = (context as Activity).getSystemService(AUDIO_SERVICE) as AudioManager
+        var k = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        Logger.showLog("onVolumeChange, k = $k")
+
+        val max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        Logger.showLog("onVolumeChange, max = $max")
+
+        mVolumeSeekBar?.setMax(max.toFloat())
+        k = (k + d!! * max).toInt()
+        if (k in 0..max) {
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, k, AudioManager.FLAG_PLAY_SOUND)
+            mVolumeSeekBar?.setProgressByPercent((k / max).toFloat())
+        } else {
+            return
+        }
     }
 
 

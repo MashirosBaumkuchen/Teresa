@@ -11,15 +11,33 @@
 
     <ProgressBar
         android:id="@+id/mProgress"
-        android:layout_gravity="center"
         style="@style/Base.Widget.AppCompat.ProgressBar"
         android:layout_width="58dp"
-        android:layout_height="58dp" />
+        android:layout_height="58dp"
+        android:layout_gravity="center" />
 
     <RelativeLayout
         android:id="@+id/mCoverContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
+
+    <com.jascal.tvp.custom.VerticalSeekBar
+        android:id="@+id/mBrightSeekBar"
+        android:layout_width="48dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginBottom="48dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="48dp" />
+
+    <com.jascal.tvp.custom.VerticalSeekBar
+        android:id="@+id/mVolumeSeekBar"
+        android:layout_width="48dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginBottom="48dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginTop="48dp" />
 
     <RelativeLayout
         android:id="@+id/mActionBar"

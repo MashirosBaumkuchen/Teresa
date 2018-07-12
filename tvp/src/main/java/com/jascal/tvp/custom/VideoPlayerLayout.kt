@@ -6,6 +6,7 @@ import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
+import com.jascal.tvp.utils.Logger
 
 /**
  * @author jascal
@@ -85,9 +86,9 @@ abstract class VideoPlayerLayout : FrameLayout {
                     val mLayoutHeight = getVideoHeight()
 
                     val dy = (startY - it.y) / mLayoutHeight
-                    if (startX > mLayoutWidth * 3.0 / 4) {
+                    if (startX > mLayoutWidth * 2 / 3.0) {
                         onVolumeChange(dy)
-                    } else if (startX < mLayoutWidth / 4.0) {
+                    } else if (startX < mLayoutWidth / 3.0) {
                         onBrightnessChange(dy)
                     }
 
@@ -106,9 +107,13 @@ abstract class VideoPlayerLayout : FrameLayout {
     }
 
     abstract fun onPrepared()
-    abstract fun getVideoWidth():Int
-    abstract fun getVideoHeight():Int
+
+    abstract fun getVideoWidth(): Int
+
+    abstract fun getVideoHeight(): Int
+
     abstract fun onVolumeChange(d: Float?)
+
     abstract fun onBrightnessChange(d: Float?)
 
 }
