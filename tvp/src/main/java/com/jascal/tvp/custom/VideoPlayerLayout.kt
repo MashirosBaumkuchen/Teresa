@@ -6,7 +6,6 @@ import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
-import com.jascal.tvp.utils.Logger
 
 /**
  * @author jascal
@@ -15,6 +14,38 @@ import com.jascal.tvp.utils.Logger
  */
 @RequiresApi(Build.VERSION_CODES.M)
 abstract class VideoPlayerLayout : FrameLayout {
+    companion object {
+        /**
+         * before stream prepared, show loading only
+         * */
+        private const val STATE_LOADING = 0
+
+        /**
+         * when stream is prepared, show cover &tailBar
+         * */
+        private const val STATE_PREPARED = 1
+
+        /**
+         * default play state, show nothing
+         * */
+        private const val STATE_DEFAULT = 2
+
+        /**
+         * when play, pause, seekTo, show tailBar
+         * */
+        private const val STATE_ACTION = 3
+
+        /**
+         * brightness motionAction start, show brightnessBar
+         * */
+        private const val STATE_BRIGHTNESS = 4
+
+        /**
+         * volume motionAction start, show volume
+         * */
+        private const val STATE_VOLUME = 5
+    }
+
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
