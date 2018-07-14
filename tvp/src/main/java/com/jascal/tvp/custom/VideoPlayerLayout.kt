@@ -137,6 +137,45 @@ abstract class VideoPlayerLayout : FrameLayout {
         return super.onTouchEvent(motionEvent)
     }
 
+    protected fun newTimer(){
+
+//        final Handler handler = new Handler() {
+//            @Override
+//            public void handleMessage(Message msg) {
+//                switch (msg.what) {
+//                    case WHAT:
+//                    tv.setText(msg.obj + "");
+//                    break;
+//                }
+//            }
+//        };
+//        //true 说明这个timer以daemon方式运行（优先级低，程序结束timer也自动结束）
+//        Timer timer = new Timer(true);
+//        TimerTask task = new TimerTask() {
+//            public void run() {
+//                //每次需要执行的代码放到这里面。
+//                    Message message = new Message();
+//                    message.what = WHAT;
+//                    message.obj = System.currentTimeMillis();
+//                    handler.sendMessage(message);
+//            }
+//        };
+//
+//        //以下是几种调度task的方法：
+//
+//        //time为Date类型：在指定时间执行一次。
+//        timer.schedule(task, time);
+//
+//        //firstTime为Date类型,period为long，表示从firstTime时刻开始，每隔period毫秒执行一次。
+//        timer.schedule(task, firstTime, period);
+//
+//        //delay 为long类型：从现在起过delay毫秒执行一次。
+//        timer.schedule(task, delay);
+//
+//        //delay为long,period为long：从现在起过delay毫秒以后，每隔period毫秒执行一次。
+//        timer.schedule(task, delay, period);
+    }
+
     abstract fun onPrepared()
 
     abstract fun getVideoWidth(): Int
