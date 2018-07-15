@@ -37,6 +37,8 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         private const val ICON_EXPAND = "ic_action_expand"
 
         private const val MIN_BRIGHTNESS = 0.2f
+
+        private const val MSG_RESET_PROGRESS = 20
     }
 
     private var view: View? = null
@@ -89,7 +91,7 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         }
     }
 
-    private fun initView() {
+    override fun initView() {
         mPlayer = MediaPlayer()
 
         val layoutId = ResUtil.getLayoutId(context, "layout_player")
@@ -108,6 +110,12 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         mBrightSeekBar = findViewById(ResUtil.getId(context, "mBrightSeekBar"))
 
         mVolumeSeekBar = findViewById(ResUtil.getId(context, "mVolumeSeekBar"))
+
+        mActionBar?.visibility = View.GONE
+        mBrightSeekBar?.visibility = View.GONE
+        mVolumeSeekBar?.visibility = View.GONE
+
+        initHandler()
     }
 
     override fun onPrepared() {
@@ -305,7 +313,7 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
     }
 
     override fun getVideoHeight(): Int {
-        return mSurfaceView!!.layoutParams.height
+        return mSurfaceView!!.layoutParams.height/2
     }
 
     override fun onBrightnessChange(d: Float?) {
@@ -333,6 +341,34 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         }
     }
 
+    override fun initHandler() {
+        mHandler = @SuppressLint("HandlerLeak")
+        object : Handler() {
+            override fun handleMessage(msg: Message) {
+                when (msg.what) {
+                    MSG_RESET_PROGRESS -> {
+                        mSeekBar!!.progress = (mPlayer!!.currentPosition)
+                        updatePlayTime()
+                    }
+                    MSG_DISMISS_ALL -> {
+                        mActionBar?.visibility = View.GONE
+                        mBrightSeekBar?.visibility = View.GONE
+                        mVolumeSeekBar?.visibility = View.GONE
+                    }
+                    MSG_SHOW_VOLUME -> {
+                        mVolumeSeekBar?.visibility = View.VISIBLE
+                    }
+                    MSG_SHOW_BRIGHTNESS -> {
+                        mBrightSeekBar?.visibility = View.VISIBLE
+                    }
+                    MSG_SHOW_ACTIONBAR -> {
+                        mActionBar?.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
+    }
+
     private fun resolveCover(cover: View) {
         mCoverContainer?.let {
             it.removeAllViews()
@@ -344,14 +380,6 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         }
     }
 
-    private var mHandler: Handler = @SuppressLint("HandlerLeak")
-    object : Handler() {
-        override fun handleMessage(msg: Message) {
-            mSeekBar!!.progress = (mPlayer!!.currentPosition)
-            updatePlayTime()
-        }
-    }
-
     inner class DelayThread(private var milliseconds: Int) : Thread() {
         override fun run() {
             while (true) {
@@ -360,7 +388,7 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
                 } catch (e: InterruptedException) {
                     e.printStackTrace()
                 }
-                mHandler.sendEmptyMessage(0)
+                mHandler?.sendEmptyMessage(0)
             }
         }
     }

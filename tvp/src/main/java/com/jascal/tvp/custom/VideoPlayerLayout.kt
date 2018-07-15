@@ -2,6 +2,8 @@ package com.jascal.tvp.custom
 
 import android.content.Context
 import android.os.Build
+import android.os.Handler
+import android.os.Message
 import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -18,32 +20,41 @@ abstract class VideoPlayerLayout : FrameLayout {
         /**
          * before stream prepared, show loading only
          * */
-        private const val STATE_LOADING = 0
+        const val STATE_LOADING = 0
 
         /**
          * when stream is prepared, show cover &tailBar
          * */
-        private const val STATE_PREPARED = 1
+        const val STATE_PREPARED = 1
 
         /**
          * default play state, show nothing
          * */
-        private const val STATE_DEFAULT = 2
+        const val STATE_DEFAULT = 2
 
         /**
          * when play, pause, seekTo, show tailBar
          * */
-        private const val STATE_ACTION = 3
+        const val STATE_ACTION = 3
 
         /**
          * brightness motionAction start, show brightnessBar
          * */
-        private const val STATE_BRIGHTNESS = 4
+        const val STATE_BRIGHTNESS = 4
 
         /**
          * volume motionAction start, show volume
          * */
-        private const val STATE_VOLUME = 5
+        const val STATE_VOLUME = 5
+
+        const val MSG_DISMISS_BRIGHTNESS = 10
+        const val MSG_DISMISS_VOLUME = 11
+        const val MSG_DISMISS_ACTIONBAR = 12
+        const val MSG_DISMISS_ALL = 13
+
+        const val MSG_SHOW_BRIGHTNESS = 14
+        const val MSG_SHOW_VOLUME = 15
+        const val MSG_SHOW_ACTIONBAR = 16
     }
 
     constructor(context: Context) : super(context)
@@ -86,14 +97,17 @@ abstract class VideoPlayerLayout : FrameLayout {
                     isActing = true
                     return true
                 }
+                sendMsg(MSG_SHOW_ACTIONBAR, 0)
             }
             MotionEvent.ACTION_CANCEL -> {
+                sendMsg(MSG_DISMISS_ALL, 2000)
                 if (isActing) {
                     isActing = false
                     return true
                 }
             }
             MotionEvent.ACTION_UP -> {
+                sendMsg(MSG_DISMISS_ALL, 2000)
                 if (isActing) {
                     isActing = false
                     return true
@@ -110,7 +124,6 @@ abstract class VideoPlayerLayout : FrameLayout {
         motionEvent?.let {
             when (it.action) {
                 MotionEvent.ACTION_DOWN -> {
-
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val mLayoutWidth = getVideoWidth()
@@ -119,61 +132,35 @@ abstract class VideoPlayerLayout : FrameLayout {
                     val dy = (startY - it.y) / mLayoutHeight
                     if (startX > mLayoutWidth * 2 / 3.0) {
                         onVolumeChange(dy)
+                        sendMsg(MSG_SHOW_VOLUME, 0)
                     } else if (startX < mLayoutWidth / 3.0) {
                         onBrightnessChange(dy)
+                        sendMsg(MSG_SHOW_BRIGHTNESS, 0)
                     }
-
                     startX = motionEvent.x
                     startY = motionEvent.y
                 }
                 MotionEvent.ACTION_UP -> {
-
+                    sendMsg(MSG_DISMISS_ALL, 2000)
                 }
                 MotionEvent.ACTION_CANCEL -> {
-
+                    sendMsg(MSG_DISMISS_ALL, 2000)
                 }
             }
         }
         return super.onTouchEvent(motionEvent)
     }
 
-    protected fun newTimer(){
+    protected var mHandler: Handler? = null
 
-//        final Handler handler = new Handler() {
-//            @Override
-//            public void handleMessage(Message msg) {
-//                switch (msg.what) {
-//                    case WHAT:
-//                    tv.setText(msg.obj + "");
-//                    break;
-//                }
-//            }
-//        };
-//        //true 说明这个timer以daemon方式运行（优先级低，程序结束timer也自动结束）
-//        Timer timer = new Timer(true);
-//        TimerTask task = new TimerTask() {
-//            public void run() {
-//                //每次需要执行的代码放到这里面。
-//                    Message message = new Message();
-//                    message.what = WHAT;
-//                    message.obj = System.currentTimeMillis();
-//                    handler.sendMessage(message);
-//            }
-//        };
-//
-//        //以下是几种调度task的方法：
-//
-//        //time为Date类型：在指定时间执行一次。
-//        timer.schedule(task, time);
-//
-//        //firstTime为Date类型,period为long，表示从firstTime时刻开始，每隔period毫秒执行一次。
-//        timer.schedule(task, firstTime, period);
-//
-//        //delay 为long类型：从现在起过delay毫秒执行一次。
-//        timer.schedule(task, delay);
-//
-//        //delay为long,period为long：从现在起过delay毫秒以后，每隔period毫秒执行一次。
-//        timer.schedule(task, delay, period);
+    abstract fun initView()
+
+    abstract fun initHandler()
+
+    protected fun sendMsg(what: Int, delay: Long) {
+        val msg = Message()
+        msg.what = what
+        mHandler?.sendMessageDelayed(msg, delay)
     }
 
     abstract fun onPrepared()
@@ -185,5 +172,4 @@ abstract class VideoPlayerLayout : FrameLayout {
     abstract fun onVolumeChange(d: Float?)
 
     abstract fun onBrightnessChange(d: Float?)
-
 }
