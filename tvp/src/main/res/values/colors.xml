@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
+    <color name="colorPoint">#ffFF4081</color>
     <color name="colorLine">#ccffffff</color>
 </resources>

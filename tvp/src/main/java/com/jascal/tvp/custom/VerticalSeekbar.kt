@@ -21,7 +21,7 @@ class VerticalSeekBar : View {
     private var mLineWidth = 0f
     private var mLineHeight = 0f
     private val mPaint: Paint by lazy { Paint() }
-    private val mPointColor: Int by lazy { ResUtil.getColorId(context, "colorAccent") }
+    private val mPointColor: Int by lazy { ResUtil.getColorId(context, "colorPoint") }
     private val mLineColor: Int by lazy { ResUtil.getColorId(context, "colorLine") }
 
     private var min = 0f
@@ -63,9 +63,9 @@ class VerticalSeekBar : View {
 
         canvas?.drawLine(mX, mRadius, mX, measuredHeight - mRadius, mPaint)
 
-        mPaint.color = Color.YELLOW
+        mPaint.color = mPointColor
 
-        canvas?.drawCircle(mX, mY, mRadius, mPaint)
+        canvas?.drawCircle(mX, mY, mRadius / 2, mPaint)
 
         mPaint.reset()
     }
@@ -86,7 +86,7 @@ class VerticalSeekBar : View {
         invalidate()
     }
 
-    fun setProgress(progress: Float){
+    fun setProgress(progress: Float) {
         this.mProgress = progress
     }
 

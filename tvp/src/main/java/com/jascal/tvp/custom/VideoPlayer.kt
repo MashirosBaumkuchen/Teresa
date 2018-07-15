@@ -388,7 +388,7 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
                 } catch (e: InterruptedException) {
                     e.printStackTrace()
                 }
-                mHandler?.sendEmptyMessage(0)
+                mHandler?.sendEmptyMessage(MSG_RESET_PROGRESS)
             }
         }
     }

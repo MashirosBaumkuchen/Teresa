@@ -3,7 +3,6 @@ package com.jascal.tvp.custom
 import android.content.Context
 import android.os.Build
 import android.os.Handler
-import android.os.Message
 import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -160,8 +159,11 @@ abstract class VideoPlayerLayout : FrameLayout {
     abstract fun initHandler()
 
     protected fun sendMsg(what: Int, delay: Long) {
-        val msg = Message()
-        msg.what = what
+        if (what == MSG_DISMISS_ALL || what == MSG_DISMISS_ACTIONBAR
+                || what == MSG_DISMISS_BRIGHTNESS || what == MSG_DISMISS_VOLUME) {
+            mHandler?.removeMessages(what)
+        }
+        val msg = mHandler?.obtainMessage(what)
         mHandler?.sendMessageDelayed(msg, delay)
     }
 
