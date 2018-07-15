@@ -55,6 +55,8 @@ abstract class VideoPlayerLayout : FrameLayout {
         const val MSG_SHOW_BRIGHTNESS = 14
         const val MSG_SHOW_VOLUME = 15
         const val MSG_SHOW_ACTIONBAR = 16
+
+        const val MSG_DELAY = 3000L
     }
 
     constructor(context: Context) : super(context)
@@ -100,14 +102,14 @@ abstract class VideoPlayerLayout : FrameLayout {
                 sendMsg(MSG_SHOW_ACTIONBAR, 0)
             }
             MotionEvent.ACTION_CANCEL -> {
-                sendMsg(MSG_DISMISS_ALL, 2000)
+                sendMsg(MSG_DISMISS_ALL, MSG_DELAY)
                 if (isActing) {
                     isActing = false
                     return true
                 }
             }
             MotionEvent.ACTION_UP -> {
-                sendMsg(MSG_DISMISS_ALL, 2000)
+                sendMsg(MSG_DISMISS_ALL, MSG_DELAY)
                 if (isActing) {
                     isActing = false
                     return true
@@ -141,10 +143,10 @@ abstract class VideoPlayerLayout : FrameLayout {
                     startY = motionEvent.y
                 }
                 MotionEvent.ACTION_UP -> {
-                    sendMsg(MSG_DISMISS_ALL, 2000)
+                    sendMsg(MSG_DISMISS_ALL, MSG_DELAY)
                 }
                 MotionEvent.ACTION_CANCEL -> {
-                    sendMsg(MSG_DISMISS_ALL, 2000)
+                    sendMsg(MSG_DISMISS_ALL, MSG_DELAY)
                 }
             }
         }
