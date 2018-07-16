@@ -111,9 +111,9 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
 
         mVolumeSeekBar = findViewById(ResUtil.getId(context, "mVolumeSeekBar"))
 
-        mActionBar?.visibility = View.GONE
-        mBrightSeekBar?.visibility = View.GONE
-        mVolumeSeekBar?.visibility = View.GONE
+//        mActionBar?.visibility = View.GONE
+//        mBrightSeekBar?.visibility = View.GONE
+//        mVolumeSeekBar?.visibility = View.GONE
 
         initHandler()
     }
@@ -132,6 +132,8 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
             it.progress = 0
             it.setOnSeekBarChangeListener(this)
         }
+
+        resetSetting()
 
         val dThread = DelayThread(100)
         dThread.start()
@@ -265,16 +267,6 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         mSurfaceView!!.layoutParams = sfLayoutParams
     }
 
-    private fun changePlayState() {
-        mPlayer?.let {
-            if (it.isPlaying) {
-                pause()
-            } else {
-                play()
-            }
-        }
-    }
-
     private fun changeOrientationState() {
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             expand()
@@ -292,52 +284,56 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
     }
 
     override fun onClick(view: View?) {
+        Logger.showLog("target!!!!")
         when (view!!.id) {
             ResUtil.getId(context, "mCollapse") -> {
                 changeOrientationState()
             }
             ResUtil.getId(context, "mStart") -> {
-                changePlayState()
+                changePlayerState()
             }
             ResUtil.getId(context, "mCoverContainer") -> {
-                changePlayState()
+                changePlayerState()
             }
             ResUtil.getId(context, "mSurfaceView") -> {
-                changePlayState()
+                changePlayerState()
             }
         }
     }
 
-    override fun getVideoWidth(): Int {
-        return mSurfaceView!!.layoutParams.width
-    }
-
-    override fun getVideoHeight(): Int {
-        return mSurfaceView!!.layoutParams.height/2
-    }
-
-    override fun onBrightnessChange(d: Float?) {
-        mBrightSeekBar?.setMin(MIN_BRIGHTNESS)
-        val layoutParams = (context as Activity).window.attributes
-        layoutParams.screenBrightness = layoutParams.screenBrightness + d!!
-        if (layoutParams.screenBrightness > 1) {
-            layoutParams.screenBrightness = 1f
-        } else if (layoutParams.screenBrightness < 0.2) {
-            layoutParams.screenBrightness = 0.2f
+    override fun updateSeek(progress: Int) {
+        Logger.showLog("current is ${mPlayer?.currentPosition}, progress is $progress")
+        mPlayer?.let {
+            it.seekTo(it.currentPosition+progress)
+            mSeekBar?.progress = it.currentPosition+progress
         }
-        (context as Activity).window.attributes = layoutParams
-        mBrightSeekBar?.setProgressByPercent(layoutParams.screenBrightness)
     }
 
-    override fun onVolumeChange(d: Float?) {
-        val audioManager = (context as Activity).getSystemService(AUDIO_SERVICE) as AudioManager
-        var k = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-        val max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        k = (k + max * d!!).toInt()
-        if (k in 0..max) {
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, k, AudioManager.FLAG_PLAY_SOUND)
-            mVolumeSeekBar?.setProgressByPercent(((k.toFloat() / max)))
-            Logger.showLog("progress: ${(k.toFloat() / max)}")
+    override fun updateBrightness(brightness: Int, max: Int) {
+        mBrightSeekBar?.setMax(max.toFloat())
+        mBrightSeekBar?.setProgress(brightness.toFloat())
+    }
+
+    override fun updateVolume(volume: Int, max: Int) {
+        mVolumeSeekBar?.setMax(max.toFloat())
+        mVolumeSeekBar?.setProgress(volume.toFloat())
+    }
+
+    override fun changeActionState(e:MotionEvent) {
+        if (mActionBar?.visibility == View.VISIBLE) {
+            mActionBar?.visibility = View.GONE
+        } else {
+            mActionBar?.visibility = View.VISIBLE
+        }
+    }
+
+    override fun changePlayerState() {
+        mPlayer?.let {
+            if (it.isPlaying) {
+                pause()
+            } else {
+                play()
+            }
         }
     }
 
@@ -350,20 +346,20 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
                         mSeekBar!!.progress = (mPlayer!!.currentPosition)
                         updatePlayTime()
                     }
-                    MSG_DISMISS_ALL -> {
-                        mActionBar?.visibility = View.GONE
-                        mBrightSeekBar?.visibility = View.GONE
-                        mVolumeSeekBar?.visibility = View.GONE
-                    }
-                    MSG_SHOW_VOLUME -> {
-                        mVolumeSeekBar?.visibility = View.VISIBLE
-                    }
-                    MSG_SHOW_BRIGHTNESS -> {
-                        mBrightSeekBar?.visibility = View.VISIBLE
-                    }
-                    MSG_SHOW_ACTIONBAR -> {
-                        mActionBar?.visibility = View.VISIBLE
-                    }
+//                    MSG_DISMISS_ALL -> {
+//                        mActionBar?.visibility = View.GONE
+//                        mBrightSeekBar?.visibility = View.GONE
+//                        mVolumeSeekBar?.visibility = View.GONE
+//                    }
+//                    MSG_SHOW_VOLUME -> {
+//                        mVolumeSeekBar?.visibility = View.VISIBLE
+//                    }
+//                    MSG_SHOW_BRIGHTNESS -> {
+//                        mBrightSeekBar?.visibility = View.VISIBLE
+//                    }
+//                    MSG_SHOW_ACTIONBAR -> {
+//                        mActionBar?.visibility = View.VISIBLE
+//                    }
                 }
             }
         }

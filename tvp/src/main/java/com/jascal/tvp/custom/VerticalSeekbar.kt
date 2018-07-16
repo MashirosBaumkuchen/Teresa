@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
 
 /**
@@ -25,7 +26,7 @@ class VerticalSeekBar : View {
     private val mLineColor: Int by lazy { ResUtil.getColorId(context, "colorLine") }
 
     private var min = 0f
-    private var max = 1f
+    private var max = 100f
 
     constructor(context: Context) : super(context)
 
@@ -50,12 +51,15 @@ class VerticalSeekBar : View {
         mLineHeight = bottom - top
 
         mX = measuredWidth / 2.0f
-        mY = (1 - 0.01f * mProgress) * (measuredHeight - mRadius * 2)
+
+        mY = measuredHeight - mRadius - (measuredHeight - 2 * mRadius) * mProgress / max
     }
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        mY = (100 - mProgress) / 100 * (measuredHeight - mRadius * 2) + mRadius
+
+        mY = measuredHeight - mRadius - (measuredHeight - 2 * mRadius) * mProgress / max
+        Logger.showLog("mY = $mY, measuredHeight = $measuredHeight")
 
         mPaint.isAntiAlias = true
         mPaint.style = Paint.Style.FILL
@@ -78,16 +82,9 @@ class VerticalSeekBar : View {
         this.max = max
     }
 
-    fun setProgressByPercent(percent: Float) {
-        val a = 1.0f / (max - min)
-        val b = -min / (max - min)
-        val target = a * percent + b
-        this.mProgress = target * 100f
-        invalidate()
-    }
-
     fun setProgress(progress: Float) {
         this.mProgress = progress
+        invalidate()
     }
 
 }
