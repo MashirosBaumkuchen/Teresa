@@ -18,8 +18,6 @@ import android.widget.*
 import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
 import java.text.SimpleDateFormat
-import android.content.Context.AUDIO_SERVICE
-import android.media.AudioManager
 
 
 /**
@@ -304,8 +302,8 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
     override fun updateSeek(progress: Int) {
         Logger.showLog("current is ${mPlayer?.currentPosition}, progress is $progress")
         mPlayer?.let {
-            it.seekTo(it.currentPosition+progress)
-            mSeekBar?.progress = it.currentPosition+progress
+            it.seekTo(it.currentPosition + progress)
+            mSeekBar?.progress = it.currentPosition + progress
         }
     }
 
@@ -319,7 +317,7 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         mVolumeSeekBar?.setProgress(volume.toFloat())
     }
 
-    override fun changeActionState(e:MotionEvent) {
+    override fun changeActionState() {
         if (mActionBar?.visibility == View.VISIBLE) {
             mActionBar?.visibility = View.GONE
         } else {
