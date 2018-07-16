@@ -18,6 +18,10 @@ import android.widget.*
 import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
 import java.text.SimpleDateFormat
+import android.R.attr.y
+import android.R.attr.x
+
+
 
 
 /**
@@ -318,11 +322,11 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
     }
 
     override fun changeActionState() {
-        if (mActionBar?.visibility == View.VISIBLE) {
-            mActionBar?.visibility = View.GONE
-        } else {
+//        if (mActionBar?.visibility == View.VISIBLE) {
+//            mActionBar?.visibility = View.GONE
+//        } else {
             mActionBar?.visibility = View.VISIBLE
-        }
+//        }
     }
 
     override fun changePlayerState() {
@@ -332,6 +336,17 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
             } else {
                 play()
             }
+        }
+    }
+
+    override fun onEvent(e: MotionEvent) {
+        val x = e.rawX // 获取相对于屏幕左上角的 x 坐标值
+        val y = e.rawY // 获取相对于屏幕左上角的 y 坐标值
+        val rect = getViewWindow(mStart!!)
+        val isInViewRect = rect.contains(x, y)
+        if(isInViewRect){
+            Logger.showLog("perform!!!!!")
+            changePlayerState()
         }
     }
 

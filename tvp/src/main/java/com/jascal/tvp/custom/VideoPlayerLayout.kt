@@ -2,6 +2,7 @@ package com.jascal.tvp.custom
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.RectF
 import android.media.AudioManager
 import android.os.Build
 import android.os.Handler
@@ -10,6 +11,7 @@ import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.View
 import android.widget.FrameLayout
 import com.jascal.tvp.utils.Logger
 
@@ -143,8 +145,18 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
     override fun onSingleTapUp(e: MotionEvent): Boolean {
         Logger.showLog("onSingleTapUp")
         changeActionState()
-        changePlayerState()
+//        changePlayerState()
+        onEvent(e)
         return true
+    }
+
+    abstract fun onEvent(e:MotionEvent)
+
+    protected fun getViewWindow(view: View): RectF {
+        var location: IntArray = IntArray(2)
+        view.getLocationOnScreen(location)
+        return RectF(location[0].toFloat(), location[1].toFloat(), (location[0] + view.width).toFloat(),
+                (location[1] + view.height).toFloat());
     }
 
     override fun onScroll(e1: MotionEvent, e2: MotionEvent,
