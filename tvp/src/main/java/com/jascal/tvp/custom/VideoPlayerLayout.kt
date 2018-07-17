@@ -13,7 +13,6 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
-import com.jascal.tvp.utils.Logger
 
 /**
  * @author jascal
@@ -88,7 +87,6 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
      * solve the motionEvent
      * */
     override fun onTouchEvent(motionEvent: MotionEvent?): Boolean {
-        Logger.showLog("onTouchEvent")
         mGesture!!.onTouchEvent(motionEvent)
         when (motionEvent?.action) {
             MotionEvent.ACTION_CANCEL -> {
@@ -107,7 +105,6 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
     abstract fun endEvent(behavior: Int)
 
     override fun onDown(e: MotionEvent): Boolean {
-        Logger.showLog("onDown")
         mBehavior = -1
         mCurrentVolume = mAudioManager!!.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
         mCurrentBrightness = ((context as Activity).window.attributes.screenBrightness * mMaxBrightness).toInt().toFloat()
@@ -115,11 +112,9 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
     }
 
     override fun onShowPress(e: MotionEvent) {
-        Logger.showLog("onShowPress")
     }
 
     override fun onSingleTapUp(e: MotionEvent): Boolean {
-        Logger.showLog("onSingleTapUp")
         onEvent(e)
         return true
     }
@@ -135,7 +130,6 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
 
     override fun onScroll(e1: MotionEvent, e2: MotionEvent,
                           distanceX: Float, distanceY: Float): Boolean {
-        Logger.showLog("onScroll")
         if (width <= 0 || height <= 0) return false
         if (mBehavior < 0) {
             val moveX = e2.x - e1.x
@@ -148,13 +142,10 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
         }
         when (mBehavior) {
             BEHAVIOR_PROGRESS -> {
-                Logger.showLog("progress")
                 val delProgress = -(1.0f * distanceX / width * 480 * 1000).toInt()
                 updateSeek(delProgress)
             }
             BEHAVIOR_BRIGHTNESS -> {
-                Logger.showLog("brightness")
-
                 if (Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) === Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
                     Settings.System.putInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE,
                             Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
@@ -173,11 +164,8 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
 
                 updateBrightness(progress, mMaxBrightness, true)
                 mCurrentBrightness = progress
-                Logger.showLog("progress = $progress, max = $mMaxBrightness")
             }
             BEHAVIOR_VOLUME -> {
-                Logger.showLog("volume")
-
                 var progress = mMaxVolume * (distanceY / height) + mCurrentVolume
 
                 if (progress <= 0) progress = 0f
@@ -187,7 +175,6 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
 
                 updateVolume(progress, mMaxVolume, true)
                 mCurrentVolume = progress
-                Logger.showLog("progress = ${Math.round(progress)}, max = $mMaxVolume")
             }
         }
         return false
@@ -210,12 +197,12 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
     /**
      * update brightness UI
      * */
-    abstract fun updateBrightness(brightness: Float, max: Float, show:Boolean)
+    abstract fun updateBrightness(brightness: Float, max: Float, show: Boolean)
 
     /**
      * update volume UI
      * */
-    abstract fun updateVolume(volume: Float, max: Float, show:Boolean)
+    abstract fun updateVolume(volume: Float, max: Float, show: Boolean)
 
     /**
      * change player state

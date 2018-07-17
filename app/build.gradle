@@ -15,13 +15,13 @@ android {
             storePassword 'teresa'
         }
     }
-    compileSdkVersion 26
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
     defaultConfig {
         applicationId "com.jascal.teresa"
         minSdkVersion rootProject.ext.android.minSdkVersion
         targetSdkVersion rootProject.ext.android.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -92,6 +92,7 @@ dependencies {
     implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.0.3'
 
     implementation project(':multiple-status-view')
+    implementation project(':tvp')
 
     // --------  Banner  --------
     implementation 'cn.bingoogolapple:bga-banner:2.1.8@aar'

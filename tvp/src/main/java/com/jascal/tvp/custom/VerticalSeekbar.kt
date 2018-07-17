@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
 
 /**
@@ -58,7 +57,6 @@ class VerticalSeekBar : View {
         super.onDraw(canvas)
 
         mY = measuredHeight - mRadius - (measuredHeight - 2 * mRadius) * mProgress / max
-        Logger.showLog("mY = $mY, measuredHeight = $measuredHeight")
 
         mPaint.isAntiAlias = true
         mPaint.style = Paint.Style.FILL

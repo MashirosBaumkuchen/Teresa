@@ -15,7 +15,6 @@ import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.*
 import android.widget.*
-import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
 import java.text.SimpleDateFormat
 
@@ -23,6 +22,17 @@ import java.text.SimpleDateFormat
  * @author jascal
  * @time 2018/7/10
  * describe a impl of VideoPlayerLayout
+ *  // set cover
+    val imageView = ImageView(this)
+    imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+    GlideApp.with(this)
+    .load(DEMO_COVER)
+    .centerCrop()
+    .into(imageView)
+    mViewPlayer.setCover(imageView)
+
+    // set uri
+    mViewPlayer.setData(DEMO_URI)
  */
 @RequiresApi(Build.VERSION_CODES.M)
 class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
@@ -77,7 +87,6 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
     fun setData(uri: String) {
         this.mUri = uri
         mPlayer?.let {
-            Logger.showLog("setData uri")
             it.setDataSource(context, Uri.parse(mUri))
             it.prepareAsync()
             it.isLooping = true
@@ -276,7 +285,6 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
     }
 
     override fun updateSeek(progress: Int) {
-        Logger.showLog("current is ${mPlayer?.currentPosition}, progress is $progress")
         mActionBar?.visibility = View.VISIBLE
         mPlayer?.let {
             it.seekTo(it.currentPosition + progress)

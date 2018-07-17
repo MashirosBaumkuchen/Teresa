@@ -20,6 +20,7 @@ import com.jascal.teresa.mvp.presenter.VideoDetailPresenter
 import com.jascal.teresa.ui.adapter.VideoDetailAdapter
 import com.jascal.teresa.utils.*
 import com.jascal.teresa.views.VideoListener
+import com.jascal.tvp.custom.VideoPlayer
 import com.orhanobut.logger.Logger
 import com.scwang.smartrefresh.header.MaterialHeader
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils
