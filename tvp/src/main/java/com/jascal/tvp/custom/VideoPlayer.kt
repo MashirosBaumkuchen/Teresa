@@ -298,7 +298,7 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
         if (mActionBar?.visibility == View.VISIBLE) {
             mActionBar?.visibility = View.GONE
         } else {
-        mActionBar?.visibility = View.VISIBLE
+            mActionBar?.visibility = View.VISIBLE
         }
     }
 
@@ -320,12 +320,10 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
     }
 
     override fun onEvent(e: MotionEvent) {
-        if (isInView(e, mStart!!)) {
-            Logger.showLog("mStart!!!!!")
-            changePlayerState()
-        }else if(isInView(e, mCollapse!!)){
-            Logger.showLog("mCollapse!!!!!")
-            changeOrientationState()
+        when {
+            isInView(e, mStart!!) -> changePlayerState()
+            isInView(e, mCollapse!!) -> changeOrientationState()
+            isInView(e, mSurfaceView!!) -> changePlayerState()
         }
     }
 
