@@ -151,7 +151,7 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
         play()
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    public override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         if (this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setVideoParams(this.mPlayer!!, isLand = false)

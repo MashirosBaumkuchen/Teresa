@@ -18,13 +18,12 @@ import com.jascal.teresa.mvp.contract.VideoDetailContract
 import com.jascal.teresa.mvp.model.bean.DiscoverBean
 import com.jascal.teresa.mvp.presenter.VideoDetailPresenter
 import com.jascal.teresa.ui.adapter.VideoDetailAdapter
-import com.jascal.teresa.utils.*
-import com.jascal.teresa.views.VideoListener
+import com.jascal.teresa.utils.CleanLeakUtils
+import com.jascal.teresa.utils.Constants
+import com.jascal.teresa.utils.StatusBarUtil
+import com.jascal.teresa.utils.WatchHistoryUtils
 import com.orhanobut.logger.Logger
 import com.scwang.smartrefresh.header.MaterialHeader
-import com.shuyu.gsyvideoplayer.utils.OrientationUtils
-import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
-import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer
 import kotlinx.android.synthetic.main.activity_video_detail.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,16 +34,16 @@ import java.util.*
  * @time 2018/7/3
  * describe
  *  // set cover
-    val imageView = ImageView(this)
-    imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-    GlideApp.with(this)
-    .load(DEMO_COVER)
-    .centerCrop()
-    .into(imageView)
-    mViewPlayer.setCover(imageView)
+val imageView = ImageView(this)
+imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+GlideApp.with(this)
+.load(DEMO_COVER)
+.centerCrop()
+.into(imageView)
+mViewPlayer.setCover(imageView)
 
-    // set uri
-    mViewPlayer.setData(DEMO_URI)
+// set uri
+mViewPlayer.setData(DEMO_URI)
  */
 class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
     companion object {
@@ -59,7 +58,6 @@ class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
 
     // Item 详细数据
     private lateinit var itemData: DiscoverBean.Issue.Item
-    private var orientationUtils: OrientationUtils? = null
     private var itemList = ArrayList<DiscoverBean.Issue.Item>()
     private var isPlay: Boolean = false
     private var isPause: Boolean = false
@@ -84,13 +82,14 @@ class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
 
         //状态栏透明和间距处理
         StatusBarUtil.immersive(this)
-        StatusBarUtil.setPaddingSmart(this, mVideoView)
+        StatusBarUtil.setPaddingSmart(this, mVideoPlayer)
 
         /***  下拉刷新  ***/
         //内容跟随偏移
         mRefreshLayout.setEnableHeaderTranslationContent(true)
         mRefreshLayout.setOnRefreshListener {
-            loadVideoInfo()
+            //            loadVideoInfo()
+            // reload
         }
         mMaterialHeader = mRefreshLayout.refreshHeader as MaterialHeader?
         //打开下拉刷新区域块背景:
@@ -102,67 +101,14 @@ class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
 
     // 初始化 VideoView 的配置
     private fun initVideoViewConfig() {
-        //设置旋转
-        orientationUtils = OrientationUtils(this, mVideoView)
-        //是否旋转
-        mVideoView.isRotateViewAuto = false
-        //是否可以滑动调整
-        mVideoView.setIsTouchWiget(true)
-
-        //增加封面
+        // set cover
         val imageView = ImageView(this)
         imageView.scaleType = ImageView.ScaleType.CENTER_CROP
         GlideApp.with(this)
                 .load(itemData.data?.cover?.feed)
                 .centerCrop()
                 .into(imageView)
-        mVideoView.thumbImageView = imageView
-
-        mVideoView.setStandardVideoAllCallBack(object : VideoListener {
-
-            override fun onPrepared(url: String, vararg objects: Any) {
-                super.onPrepared(url, *objects)
-                //开始播放了才能旋转和全屏
-                orientationUtils?.isEnable = true
-                isPlay = true
-            }
-
-            override fun onAutoComplete(url: String, vararg objects: Any) {
-                super.onAutoComplete(url, *objects)
-                Logger.d("***** onAutoPlayComplete **** ")
-            }
-
-            override fun onPlayError(url: String, vararg objects: Any) {
-                super.onPlayError(url, *objects)
-                showToast("播放失败")
-            }
-
-            override fun onEnterFullscreen(url: String, vararg objects: Any) {
-                super.onEnterFullscreen(url, *objects)
-                Logger.d("***** onEnterFullscreen **** ")
-            }
-
-            override fun onQuitFullscreen(url: String, vararg objects: Any) {
-                super.onQuitFullscreen(url, *objects)
-                Logger.d("***** onQuitFullscreen **** ")
-                //列表返回的样式判断
-                orientationUtils?.backToProtVideo()
-            }
-        })
-        //设置返回按键功能
-        mVideoView.backButton.setOnClickListener { onBackPressed() }
-        //设置全屏按键功能
-        mVideoView.fullscreenButton.setOnClickListener {
-            //直接横屏
-            orientationUtils?.resolveByClick()
-            //第一个true是否需要隐藏actionbar，第二个true是否需要隐藏statusbar
-            mVideoView.startWindowFullscreen(this, true, true)
-        }
-        //锁屏事件
-        mVideoView.setLockClickListener { view, lock ->
-            //配合下方的onConfigurationChanged
-            orientationUtils?.isEnable = !lock
-        }
+        mVideoPlayer.setCover(imageView)
     }
 
     // 初始化数据
@@ -197,9 +143,7 @@ class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
     // 设置播放视频 URL
     override fun setVideo(url: String) {
         Logger.d("playUrl:$url")
-        mVideoView.setUp(url, false, "")
-        //开始自动播放
-        mVideoView.startPlayLogic()
+        mVideoPlayer.setData(url)
     }
 
     // 设置视频信息
@@ -233,9 +177,7 @@ class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
-        if (isPlay && !isPause) {
-            mVideoView.onConfigurationChanged(this, newConfig, orientationUtils)
-        }
+        mVideoPlayer.onConfigurationChanged(newConfig)
     }
 
     // 加载视频信息
@@ -244,12 +186,7 @@ class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
     }
 
     override fun onBackPressed() {
-        orientationUtils?.backToProtVideo()
-        if (StandardGSYVideoPlayer.backFromWindowFull(this))
-            return
-        //释放所有
-        mVideoView.setStandardVideoAllCallBack(null)
-        GSYVideoPlayer.releaseAllVideos()
+//        GSYVideoPlayer.releaseAllVideos()
         if (isTransition && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) run {
             super.onBackPressed()
         } else {
@@ -260,34 +197,25 @@ class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
 
     override fun onResume() {
         super.onResume()
-        getCurPlay().onVideoResume()
         isPause = false
     }
 
     override fun onPause() {
         super.onPause()
-        getCurPlay().onVideoPause()
         isPause = true
     }
 
     override fun onDestroy() {
         CleanLeakUtils.fixInputMethodManagerLeak(this)
         super.onDestroy()
-        GSYVideoPlayer.releaseAllVideos()
-        orientationUtils?.releaseListener()
+//        GSYVideoPlayer.releaseAllVideos()
         mPresenter.detachView()
-    }
-
-    private fun getCurPlay(): GSYVideoPlayer {
-        return if (mVideoView.fullWindowPlayer != null) {
-            mVideoView.fullWindowPlayer
-        } else mVideoView
     }
 
     private fun initTransition() {
         if (isTransition && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             postponeEnterTransition()
-            ViewCompat.setTransitionName(mVideoView, IMG_TRANSITION)
+            ViewCompat.setTransitionName(mVideoPlayer, IMG_TRANSITION)
             addTransitionListener()
             startPostponedEnterTransition()
         } else {

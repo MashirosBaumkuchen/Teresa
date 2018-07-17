@@ -18,8 +18,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
-            android:id="@+id/mVideoView"
+        <com.jascal.tvp.custom.VideoPlayer
+            android:id="@+id/mVideoPlayer"
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:background="@color/titleColorBlack" />
@@ -28,12 +28,12 @@
             android:id="@+id/mVideoBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/mVideoView" />
+            android:layout_below="@+id/mVideoPlayer" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/mVideoView"
+            android:layout_below="@id/mVideoPlayer"
             android:background="@color/darkerGray" />
 
 
@@ -41,7 +41,7 @@
             android:id="@+id/mRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/mVideoView" />
+            android:layout_below="@+id/mVideoPlayer" />
 
     </RelativeLayout>
 </com.scwang.smartrefresh.layout.SmartRefreshLayout>
