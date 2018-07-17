@@ -19,7 +19,6 @@ import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
 import java.text.SimpleDateFormat
 
-
 /**
  * @author jascal
  * @time 2018/7/10
@@ -109,9 +108,9 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
 
         mVolumeSeekBar = findViewById(ResUtil.getId(context, "mVolumeSeekBar"))
 
-//        mActionBar?.visibility = View.GONE
-//        mBrightSeekBar?.visibility = View.GONE
-//        mVolumeSeekBar?.visibility = View.GONE
+        mActionBar?.visibility = View.GONE
+        mBrightSeekBar?.visibility = View.GONE
+        mVolumeSeekBar?.visibility = View.GONE
 
         initHandler()
     }
@@ -278,18 +277,25 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
 
     override fun updateSeek(progress: Int) {
         Logger.showLog("current is ${mPlayer?.currentPosition}, progress is $progress")
+        mActionBar?.visibility = View.VISIBLE
         mPlayer?.let {
             it.seekTo(it.currentPosition + progress)
             mSeekBar?.progress = it.currentPosition + progress
         }
     }
 
-    override fun updateBrightness(brightness: Float, max: Float) {
+    override fun updateBrightness(brightness: Float, max: Float, show: Boolean) {
+        if (show) {
+            mBrightSeekBar?.visibility = View.VISIBLE
+        }
         mBrightSeekBar?.setMax(max)
         mBrightSeekBar?.setProgress(brightness)
     }
 
-    override fun updateVolume(volume: Float, max: Float) {
+    override fun updateVolume(volume: Float, max: Float, show: Boolean) {
+        if (show) {
+            mVolumeSeekBar?.visibility = View.VISIBLE
+        }
         mVolumeSeekBar?.setMax(max)
         mVolumeSeekBar?.setProgress(volume)
     }
@@ -327,6 +333,20 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
         }
     }
 
+    override fun endEvent(behavior: Int) {
+        when (behavior) {
+            BEHAVIOR_VOLUME -> {
+                mVolumeSeekBar?.visibility = View.GONE
+            }
+            BEHAVIOR_BRIGHTNESS -> {
+                mBrightSeekBar?.visibility = View.GONE
+            }
+            BEHAVIOR_PROGRESS -> {
+                mActionBar?.visibility = View.GONE
+            }
+        }
+    }
+
     override fun initHandler() {
         mHandler = @SuppressLint("HandlerLeak")
         object : Handler() {
@@ -336,20 +356,6 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
                         mSeekBar!!.progress = (mPlayer!!.currentPosition)
                         updatePlayTime()
                     }
-//                    MSG_DISMISS_ALL -> {
-//                        mActionBar?.visibility = View.GONE
-//                        mBrightSeekBar?.visibility = View.GONE
-//                        mVolumeSeekBar?.visibility = View.GONE
-//                    }
-//                    MSG_SHOW_VOLUME -> {
-//                        mVolumeSeekBar?.visibility = View.VISIBLE
-//                    }
-//                    MSG_SHOW_BRIGHTNESS -> {
-//                        mBrightSeekBar?.visibility = View.VISIBLE
-//                    }
-//                    MSG_SHOW_ACTIONBAR -> {
-//                        mActionBar?.visibility = View.VISIBLE
-//                    }
                 }
             }
         }

@@ -64,8 +64,8 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
     }
 
     protected fun resetSetting() {
-        updateVolume(mCurrentVolume, mMaxVolume)
-        updateBrightness(mCurrentBrightness, mMaxBrightness)
+        updateVolume(mCurrentVolume, mMaxVolume, false)
+        updateBrightness(mCurrentBrightness, mMaxBrightness, false)
     }
 
     /**
@@ -89,8 +89,22 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
      * */
     override fun onTouchEvent(motionEvent: MotionEvent?): Boolean {
         Logger.showLog("onTouchEvent")
-        return mGesture!!.onTouchEvent(motionEvent)
+        mGesture!!.onTouchEvent(motionEvent)
+        when (motionEvent?.action) {
+            MotionEvent.ACTION_CANCEL -> {
+                endEvent(mBehavior)
+            }
+            MotionEvent.ACTION_UP -> {
+                endEvent(mBehavior)
+            }
+            MotionEvent.ACTION_OUTSIDE -> {
+                endEvent(mBehavior)
+            }
+        }
+        return true
     }
+
+    abstract fun endEvent(behavior: Int)
 
     override fun onDown(e: MotionEvent): Boolean {
         Logger.showLog("onDown")
@@ -157,7 +171,7 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
                 params.screenBrightness = progress / mMaxBrightness
                 window.attributes = params
 
-                updateBrightness(progress, mMaxBrightness)
+                updateBrightness(progress, mMaxBrightness, true)
                 mCurrentBrightness = progress
                 Logger.showLog("progress = $progress, max = $mMaxBrightness")
             }
@@ -171,7 +185,7 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
 
                 mAudioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC, Math.round(progress), 0)
 
-                updateVolume(progress, mMaxVolume)
+                updateVolume(progress, mMaxVolume, true)
                 mCurrentVolume = progress
                 Logger.showLog("progress = ${Math.round(progress)}, max = $mMaxVolume")
             }
@@ -196,12 +210,12 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
     /**
      * update brightness UI
      * */
-    abstract fun updateBrightness(brightness: Float, max: Float)
+    abstract fun updateBrightness(brightness: Float, max: Float, show:Boolean)
 
     /**
      * update volume UI
      * */
-    abstract fun updateVolume(volume: Float, max: Float)
+    abstract fun updateVolume(volume: Float, max: Float, show:Boolean)
 
     /**
      * change player state
