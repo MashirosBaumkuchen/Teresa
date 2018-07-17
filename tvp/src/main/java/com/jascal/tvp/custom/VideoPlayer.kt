@@ -18,10 +18,6 @@ import android.widget.*
 import com.jascal.tvp.utils.Logger
 import com.jascal.tvp.utils.ResUtil
 import java.text.SimpleDateFormat
-import android.R.attr.y
-import android.R.attr.x
-
-
 
 
 /**
@@ -30,7 +26,7 @@ import android.R.attr.x
  * describe a impl of VideoPlayerLayout
  */
 @RequiresApi(Build.VERSION_CODES.M)
-class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
 
     companion object {
         private const val ICON_START = "ic_action_start"
@@ -123,11 +119,6 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
     override fun onPrepared() {
         resolveCover(mCover!!)
         setVideoParams(mPlayer!!, false)
-
-        mSurfaceView?.setOnClickListener(this)
-        mCoverContainer?.setOnClickListener(this)
-        mStart?.setOnClickListener(this)
-        mCollapse?.setOnClickListener(this)
 
         mSeekBar?.let {
             it.max = mPlayer!!.duration
@@ -285,24 +276,6 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         return "$str1/$str"
     }
 
-    override fun onClick(view: View?) {
-        Logger.showLog("target!!!!")
-        when (view!!.id) {
-            ResUtil.getId(context, "mCollapse") -> {
-                changeOrientationState()
-            }
-            ResUtil.getId(context, "mStart") -> {
-                changePlayerState()
-            }
-            ResUtil.getId(context, "mCoverContainer") -> {
-                changePlayerState()
-            }
-            ResUtil.getId(context, "mSurfaceView") -> {
-                changePlayerState()
-            }
-        }
-    }
-
     override fun updateSeek(progress: Int) {
         Logger.showLog("current is ${mPlayer?.currentPosition}, progress is $progress")
         mPlayer?.let {
@@ -311,22 +284,22 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         }
     }
 
-    override fun updateBrightness(brightness: Int, max: Int) {
-        mBrightSeekBar?.setMax(max.toFloat())
-        mBrightSeekBar?.setProgress(brightness.toFloat())
+    override fun updateBrightness(brightness: Float, max: Float) {
+        mBrightSeekBar?.setMax(max)
+        mBrightSeekBar?.setProgress(brightness)
     }
 
-    override fun updateVolume(volume: Int, max: Int) {
-        mVolumeSeekBar?.setMax(max.toFloat())
-        mVolumeSeekBar?.setProgress(volume.toFloat())
+    override fun updateVolume(volume: Float, max: Float) {
+        mVolumeSeekBar?.setMax(max)
+        mVolumeSeekBar?.setProgress(volume)
     }
 
     override fun changeActionState() {
-//        if (mActionBar?.visibility == View.VISIBLE) {
-//            mActionBar?.visibility = View.GONE
-//        } else {
-            mActionBar?.visibility = View.VISIBLE
-//        }
+        if (mActionBar?.visibility == View.VISIBLE) {
+            mActionBar?.visibility = View.GONE
+        } else {
+        mActionBar?.visibility = View.VISIBLE
+        }
     }
 
     override fun changePlayerState() {
@@ -339,14 +312,20 @@ class VideoPlayer : VideoPlayerLayout, View.OnClickListener, SeekBar.OnSeekBarCh
         }
     }
 
+    private fun isInView(e: MotionEvent, view: View): Boolean {
+        val x = e.rawX
+        val y = e.rawY
+        val rect = getViewWindow(view)
+        return rect.contains(x, y)
+    }
+
     override fun onEvent(e: MotionEvent) {
-        val x = e.rawX // 获取相对于屏幕左上角的 x 坐标值
-        val y = e.rawY // 获取相对于屏幕左上角的 y 坐标值
-        val rect = getViewWindow(mStart!!)
-        val isInViewRect = rect.contains(x, y)
-        if(isInViewRect){
-            Logger.showLog("perform!!!!!")
+        if (isInView(e, mStart!!)) {
+            Logger.showLog("mStart!!!!!")
             changePlayerState()
+        }else if(isInView(e, mCollapse!!)){
+            Logger.showLog("mCollapse!!!!!")
+            changeOrientationState()
         }
     }
 

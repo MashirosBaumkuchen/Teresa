@@ -24,58 +24,20 @@ import com.jascal.tvp.utils.Logger
 @RequiresApi(Build.VERSION_CODES.M)
 abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListener {
     companion object {
-        /**
-         * before stream prepared, show loading only
-         * */
-        const val STATE_LOADING = 0
-
-        /**
-         * when stream is prepared, show cover &tailBar
-         * */
-        const val STATE_PREPARED = 1
-
-        /**
-         * default play state, show nothing
-         * */
-        const val STATE_DEFAULT = 2
-
-        /**
-         * when play, pause, seekTo, show tailBar
-         * */
-        const val STATE_ACTION = 3
-
-        /**
-         * brightness motionAction start, show brightnessBar
-         * */
-        const val STATE_BRIGHTNESS = 4
-
-        /**
-         * volume motionAction start, show volume
-         * */
-        const val STATE_VOLUME = 5
-
-        const val MSG_DISMISS_BRIGHTNESS = 10
-        const val MSG_DISMISS_VOLUME = 11
-        const val MSG_DISMISS_ACTIONBAR = 12
-        const val MSG_DISMISS_ALL = 13
-
-        const val MSG_SHOW_BRIGHTNESS = 14
-        const val MSG_SHOW_VOLUME = 15
-        const val MSG_SHOW_ACTIONBAR = 16
-
-        const val MSG_DELAY = 3000L
-
-        const val BEHAVIOR_PROGRESS = 47
-        const val BEHAVIOR_VOLUME = 48
-        const val BEHAVIOR_BRIGHTNESS = 49
+        const val BEHAVIOR_PROGRESS = 0
+        const val BEHAVIOR_VOLUME = 1
+        const val BEHAVIOR_BRIGHTNESS = 2
     }
 
     private var mBehavior = -1
-    private var mCurrentBrightness = 0
-    private var mCurrentVolume = 0
+
+    private var mCurrentBrightness = 0f
+    private var mMaxBrightness = 0f
+
+    private var mCurrentVolume = 0f
+    private var mMaxVolume = 0f
+
     private var mGesture: GestureDetector? = null
-    private var mMaxBrightness = -1
-    private var mMaxVolume = 0
     private var mAudioManager: AudioManager? = null
 
     constructor(context: Context) : super(context) {
@@ -94,11 +56,11 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
         mGesture = GestureDetector(context, this)
         mAudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-        mCurrentVolume = mAudioManager!!.getStreamVolume(AudioManager.STREAM_MUSIC)
-        mMaxVolume = mAudioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        mCurrentVolume = mAudioManager!!.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
+        mMaxVolume = mAudioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat()
 
-        mCurrentBrightness = ((context as Activity).window.attributes.screenBrightness * mMaxBrightness).toInt()
-        mMaxBrightness = 255
+        mCurrentBrightness = ((context as Activity).window.attributes.screenBrightness * mMaxBrightness)
+        mMaxBrightness = 255f
     }
 
     protected fun resetSetting() {
@@ -133,8 +95,8 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
     override fun onDown(e: MotionEvent): Boolean {
         Logger.showLog("onDown")
         mBehavior = -1
-        mCurrentVolume = mAudioManager!!.getStreamVolume(AudioManager.STREAM_MUSIC)
-        mCurrentBrightness = ((context as Activity).window.attributes.screenBrightness * mMaxBrightness).toInt()
+        mCurrentVolume = mAudioManager!!.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
+        mCurrentBrightness = ((context as Activity).window.attributes.screenBrightness * mMaxBrightness).toInt().toFloat()
         return true
     }
 
@@ -144,13 +106,11 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
 
     override fun onSingleTapUp(e: MotionEvent): Boolean {
         Logger.showLog("onSingleTapUp")
-        changeActionState()
-//        changePlayerState()
         onEvent(e)
         return true
     }
 
-    abstract fun onEvent(e:MotionEvent)
+    abstract fun onEvent(e: MotionEvent)
 
     protected fun getViewWindow(view: View): RectF {
         var location: IntArray = IntArray(2)
@@ -186,15 +146,15 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
                             Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
                 }
 
-                var progress = (mMaxBrightness * (distanceY / height) + mCurrentBrightness).toInt()
+                var progress = (mMaxBrightness * (distanceY / height) + mCurrentBrightness)
 
                 // 控制调节临界范围
-                if (progress <= 0) progress = 0
+                if (progress <= 0) progress = 0f
                 if (progress >= mMaxBrightness) progress = mMaxBrightness
 
                 val window = (context as Activity).window
                 val params = window.attributes
-                params.screenBrightness = progress / mMaxBrightness.toFloat()
+                params.screenBrightness = progress / mMaxBrightness
                 window.attributes = params
 
                 updateBrightness(progress, mMaxBrightness)
@@ -204,15 +164,15 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
             BEHAVIOR_VOLUME -> {
                 Logger.showLog("volume")
 
-                var progress = mMaxVolume * (distanceY * 3 / height) + mCurrentVolume
+                var progress = mMaxVolume * (distanceY / height) + mCurrentVolume
 
-                // 控制调节临界范围
                 if (progress <= 0) progress = 0f
-                if (progress >= mMaxVolume) progress = mMaxVolume.toFloat()
+                if (progress >= mMaxVolume) progress = mMaxVolume
 
                 mAudioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC, Math.round(progress), 0)
-                updateVolume(Math.round(progress), mMaxVolume)
-                mCurrentVolume = progress.toInt()
+
+                updateVolume(progress, mMaxVolume)
+                mCurrentVolume = progress
                 Logger.showLog("progress = ${Math.round(progress)}, max = $mMaxVolume")
             }
         }
@@ -228,16 +188,34 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
         return true
     }
 
+    /**
+     * update player seekTo UI
+     * */
     abstract fun updateSeek(progress: Int)
 
-    abstract fun updateBrightness(brightness: Int, max: Int)
+    /**
+     * update brightness UI
+     * */
+    abstract fun updateBrightness(brightness: Float, max: Float)
 
-    abstract fun updateVolume(volume: Int, max: Int)
+    /**
+     * update volume UI
+     * */
+    abstract fun updateVolume(volume: Float, max: Float)
 
+    /**
+     * change player state
+     * */
     abstract fun changePlayerState()
 
+    /**
+     * change bottom actionBar state
+     * */
     abstract fun changeActionState()
 
+    /**
+     * control view dismiss & seekBar position
+     * */
     protected var mHandler: Handler? = null
 
     abstract fun initView()
