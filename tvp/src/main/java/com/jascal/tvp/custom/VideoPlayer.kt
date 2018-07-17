@@ -7,11 +7,9 @@ import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build
 import android.os.Handler
 import android.os.Message
 import android.os.Parcelable
-import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.*
 import android.widget.*
@@ -23,18 +21,17 @@ import java.text.SimpleDateFormat
  * @time 2018/7/10
  * describe a impl of VideoPlayerLayout
  *  // set cover
-    val imageView = ImageView(this)
-    imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-    GlideApp.with(this)
-    .load(DEMO_COVER)
-    .centerCrop()
-    .into(imageView)
-    mViewPlayer.setCover(imageView)
+val imageView = ImageView(this)
+imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+GlideApp.with(this)
+.load(DEMO_COVER)
+.centerCrop()
+.into(imageView)
+mViewPlayer.setCover(imageView)
 
-    // set uri
-    mViewPlayer.setData(DEMO_URI)
+// set uri
+mViewPlayer.setData(DEMO_URI)
  */
-@RequiresApi(Build.VERSION_CODES.M)
 class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
 
     companion object {

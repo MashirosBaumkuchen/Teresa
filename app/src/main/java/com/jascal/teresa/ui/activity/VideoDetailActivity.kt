@@ -20,7 +20,6 @@ import com.jascal.teresa.mvp.presenter.VideoDetailPresenter
 import com.jascal.teresa.ui.adapter.VideoDetailAdapter
 import com.jascal.teresa.utils.*
 import com.jascal.teresa.views.VideoListener
-import com.jascal.tvp.custom.VideoPlayer
 import com.orhanobut.logger.Logger
 import com.scwang.smartrefresh.header.MaterialHeader
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils
@@ -35,6 +34,17 @@ import java.util.*
  * @author jascal
  * @time 2018/7/3
  * describe
+ *  // set cover
+    val imageView = ImageView(this)
+    imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+    GlideApp.with(this)
+    .load(DEMO_COVER)
+    .centerCrop()
+    .into(imageView)
+    mViewPlayer.setCover(imageView)
+
+    // set uri
+    mViewPlayer.setData(DEMO_URI)
  */
 class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
     companion object {

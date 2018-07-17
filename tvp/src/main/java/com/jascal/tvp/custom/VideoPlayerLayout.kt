@@ -4,10 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.RectF
 import android.media.AudioManager
-import android.os.Build
 import android.os.Handler
 import android.provider.Settings
-import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -20,7 +18,6 @@ import android.widget.FrameLayout
  * describe base layout of GestureDetector
  */
 @Suppress("LeakingThis", "DEPRECATED_IDENTITY_EQUALS")
-@RequiresApi(Build.VERSION_CODES.M)
 abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListener {
     companion object {
         const val BEHAVIOR_PROGRESS = 0
