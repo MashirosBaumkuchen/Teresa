@@ -96,9 +96,4 @@ dependencies {
 
     // --------  Banner  --------
     implementation 'cn.bingoogolapple:bga-banner:2.1.8@aar'
-
-    // -------- player --------
-    implementation 'com.shuyu:GSYVideoPlayer:2.1.1'
-
-
 }

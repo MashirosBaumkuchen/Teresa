@@ -230,10 +230,10 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
         var screenHeight = 0f
         if (isFirst) {
             screenHeight = layoutParams.height.toFloat()
-            por = screenWidth / screenHeight
+            por = screenHeight / screenWidth
             isFirst = false
         } else {
-            screenHeight = resources.displayMetrics.widthPixels * 9f / 16f
+            screenHeight = resources.displayMetrics.widthPixels * por
         }
 
         (context as Activity).window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
