@@ -114,7 +114,6 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
 
         mVolumeSeekBar = findViewById(ResUtil.getId(context, "mVolumeSeekBar"))
 
-        mActionBar?.visibility = View.GONE
         mBrightSeekBar?.visibility = View.GONE
         mVolumeSeekBar?.visibility = View.GONE
 
@@ -306,11 +305,7 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
     }
 
     override fun changeActionState() {
-        if (mActionBar?.visibility == View.VISIBLE) {
-            mActionBar?.visibility = View.GONE
-        } else {
-            mActionBar?.visibility = View.VISIBLE
-        }
+
     }
 
     override fun changePlayerState() {
@@ -338,6 +333,13 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
         }
     }
 
+    fun release(){
+        mPlayer?.let {
+            it.stop()
+            it.release()
+        }
+    }
+
     override fun endEvent(behavior: Int) {
         when (behavior) {
             BEHAVIOR_VOLUME -> {
@@ -347,7 +349,7 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
                 mBrightSeekBar?.visibility = View.GONE
             }
             BEHAVIOR_PROGRESS -> {
-                mActionBar?.visibility = View.GONE
+
             }
         }
     }
