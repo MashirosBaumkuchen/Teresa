@@ -166,6 +166,7 @@ class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
         mPresenter.detachView()
     }
 
+    // TODO
     private fun initTransition() {
         if (isTransition && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             postponeEnterTransition()
