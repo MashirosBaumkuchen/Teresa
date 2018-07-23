@@ -24,10 +24,7 @@ class VideoDetailPresenter : BasePresenter<VideoDetailContract.View>(), VideoDet
     override fun loadVideoInfo(itemInfo: DiscoverBean.Issue.Item) {
         val playInfo = itemInfo.data?.playInfo
         val netType = NetworkUtil.isWifi(MyApplication.context)
-        // 检测是否绑定 View
-//        checkViewAttached()
         if (playInfo!!.size > 1) {
-            // 当前网络是 Wifi环境下选择高清的视频
             if (netType) {
                 for (i in playInfo) {
                     if (i.type == "high") {
@@ -37,7 +34,6 @@ class VideoDetailPresenter : BasePresenter<VideoDetailContract.View>(), VideoDet
                     }
                 }
             } else {
-                //否则就选标清的视频
                 for (i in playInfo) {
                     if (i.type == "normal") {
                         val playUrl = i.url
@@ -52,9 +48,6 @@ class VideoDetailPresenter : BasePresenter<VideoDetailContract.View>(), VideoDet
         } else {
             mRootView?.setVideo(itemInfo.data.playUrl)
         }
-        //设置背景
-//        val backgroundUrl = itemInfo.data.cover.blurred + "/thumbnail/${DisplayManager.getScreenHeight()!! - DisplayManager.dip2px(250f)!!}x${DisplayManager.getScreenWidth()}"
-//        backgroundUrl.let { mRootView?.setBackground(it) }
         mRootView?.setVideoInfo(itemInfo)
     }
 

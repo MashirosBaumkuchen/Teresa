@@ -15,8 +15,6 @@ interface VideoDetailContract {
 
         fun setVideoInfo(itemInfo: DiscoverBean.Issue.Item)
 
-        fun setBackground(url: String)
-
         fun setRecentRelatedVideo(itemList: ArrayList<DiscoverBean.Issue.Item>)
 
         fun setErrorMsg(errorMsg: String)

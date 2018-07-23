@@ -120,6 +120,7 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
         initHandler()
     }
 
+    private var dThread: DelayThread? = null
     override fun onPrepared() {
         resolveCover(mCover!!)
         setVideoParams(mPlayer!!, false)
@@ -132,8 +133,8 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
 
         resetSetting()
 
-        val dThread = DelayThread(100)
-        dThread.start()
+        dThread = DelayThread(100)
+        dThread?.start()
     }
 
     override fun onProgressChanged(seekbar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -333,10 +334,17 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
         }
     }
 
-    fun release(){
-        mPlayer?.let {
-            it.stop()
-            it.release()
+    fun releaseVideo() {
+        dThread?.interrupt()
+        mHandler?.removeMessages(MSG_RESET_PROGRESS)
+        try {
+            mPlayer?.let {
+                it.stop()
+                it.release()
+            }
+            mPlayer = null
+        } catch (e: IllegalStateException) {
+
         }
     }
 
@@ -360,8 +368,14 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
             override fun handleMessage(msg: Message) {
                 when (msg.what) {
                     MSG_RESET_PROGRESS -> {
-                        mSeekBar!!.progress = (mPlayer!!.currentPosition)
-                        updatePlayTime()
+                        try {
+                            mPlayer?.let {
+                                mSeekBar?.progress = (it.currentPosition)
+                                updatePlayTime()
+                            }
+                        } catch (e: IllegalStateException) {
+
+                        }
                     }
                 }
             }
@@ -402,7 +416,11 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
         }
 
         override fun surfaceDestroyed(holder: SurfaceHolder) {
-            mPlayer!!.pause()
+            try {
+                mPlayer?.pause()
+            } catch (e: IllegalStateException) {
+
+            }
         }
     }
 
