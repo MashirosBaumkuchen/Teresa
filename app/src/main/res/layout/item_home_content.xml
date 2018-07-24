@@ -10,7 +10,7 @@
         android:id="@+id/iv_cover_feed"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:scaleType="fitXY"
+        android:scaleType="fitCenter"
         android:src="@drawable/placeholder_banner" />
 
     <RelativeLayout
@@ -23,6 +23,7 @@
             android:layout_height="40dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
+            android:scaleType="fitCenter"
             android:layout_marginRight="15dp"
             tools:src="@mipmap/ic_launcher_round" />
 
