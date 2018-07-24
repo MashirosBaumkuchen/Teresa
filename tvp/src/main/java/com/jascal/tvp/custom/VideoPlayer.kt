@@ -20,17 +20,6 @@ import java.text.SimpleDateFormat
  * @author jascal
  * @time 2018/7/10
  * describe a impl of VideoPlayerLayout
- *  // set cover
-val imageView = ImageView(this)
-imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-GlideApp.with(this)
-.load(DEMO_COVER)
-.centerCrop()
-.into(imageView)
-mViewPlayer.setCover(imageView)
-
-// set uri
-mViewPlayer.setData(DEMO_URI)
  */
 class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
 

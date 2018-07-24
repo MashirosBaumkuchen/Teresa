@@ -1,15 +1,10 @@
 package com.jascal.teresa.mvp.presenter
 
-import android.app.Activity
-import com.jascal.teresa.MyApplication
 import com.jascal.teresa.base.BasePresenter
 import com.jascal.teresa.mvp.contract.VideoDetailContract
 import com.jascal.teresa.mvp.model.VideoDetailModel
 import com.jascal.teresa.mvp.model.bean.DiscoverBean
 import com.jascal.teresa.net.exception.ExceptionHandler
-import com.jascal.teresa.utils.NetworkUtil
-import com.jascal.teresa.utils.dataFormat
-import com.jascal.teresa.utils.showToast
 
 /**
  * @author jascal
@@ -23,27 +18,11 @@ class VideoDetailPresenter : BasePresenter<VideoDetailContract.View>(), VideoDet
 
     override fun loadVideoInfo(itemInfo: DiscoverBean.Issue.Item) {
         val playInfo = itemInfo.data?.playInfo
-        val netType = NetworkUtil.isWifi(MyApplication.context)
         if (playInfo!!.size > 1) {
-            if (netType) {
-                for (i in playInfo) {
-                    if (i.type == "high") {
-                        val playUrl = i.url
-                        mRootView?.setVideo(playUrl)
-                        break
-                    }
-                }
-            } else {
-                for (i in playInfo) {
-                    if (i.type == "normal") {
-                        val playUrl = i.url
-                        mRootView?.setVideo(playUrl)
-                        //Todo 待完善
-                        (mRootView as Activity).showToast("本次消耗${(mRootView as Activity)
-                                .dataFormat(i.urlList[0].size)}流量")
-                        break
-                    }
-                }
+            for (i in playInfo) {
+                val playUrl = i.url
+                mRootView?.setVideo(playUrl)
+                break
             }
         } else {
             mRootView?.setVideo(itemInfo.data.playUrl)
