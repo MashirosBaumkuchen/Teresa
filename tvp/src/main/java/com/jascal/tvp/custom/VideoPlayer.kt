@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.Message
 import android.os.Parcelable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.*
 import android.widget.*
 import com.jascal.tvp.utils.ResUtil
@@ -211,44 +212,38 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
     }
 
     private var isFirst = true
-    private var por = 0f
+    private var videoPor = 0f
+    private var windowW = 0f
+    private var windowH = 0f
     private fun setVideoParams(mediaPlayer: MediaPlayer, isLand: Boolean) {
         val flLayoutParams = layoutParams
         val sfLayoutParams = mSurfaceView!!.layoutParams
 
-        var screenWidth = resources.displayMetrics.widthPixels.toFloat()
-        var screenHeight = 0f
+        var videoWidth = resources.displayMetrics.widthPixels.toFloat()
+        var videoHeight = 0f
+
         if (isFirst) {
-            screenHeight = layoutParams.height.toFloat()
-            por = screenHeight / screenWidth
+            windowW = resources.displayMetrics.widthPixels.toFloat()
+            windowH = layoutParams.height.toFloat()
+            videoHeight = layoutParams.height.toFloat() * mediaPlayer.videoWidth.toFloat() / videoWidth
+            videoPor = videoHeight / videoWidth
             isFirst = false
         } else {
-            screenHeight = resources.displayMetrics.widthPixels * por
+            videoHeight = videoWidth * videoPor
         }
 
+        sfLayoutParams.width = videoWidth.toInt()
+        sfLayoutParams.height = videoHeight.toInt()
+
+        // window params
         (context as Activity).window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         if (isLand) {
-            screenHeight = resources.displayMetrics.heightPixels.toFloat()
             (context as Activity).window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        }
-
-        flLayoutParams.width = screenWidth.toInt()
-        flLayoutParams.height = screenHeight.toInt()
-
-        val videoWidth = mediaPlayer.videoWidth
-        val videoHeight = mediaPlayer.videoHeight
-
-        val videoPor = (videoWidth / videoHeight).toFloat()
-        val screenPor = screenWidth / screenHeight
-
-        //16:9    16:12
-        if (screenPor > videoPor) {
-            sfLayoutParams.height = screenHeight.toInt()
-            sfLayoutParams.width = (screenHeight * screenPor).toInt()
+            flLayoutParams.width = resources.displayMetrics.widthPixels
+            flLayoutParams.height = resources.displayMetrics.heightPixels
         } else {
-            //16:9  19:9
-            sfLayoutParams.width = screenWidth.toInt()
-            sfLayoutParams.height = (screenWidth / screenPor).toInt()
+            flLayoutParams.width = windowW.toInt()
+            flLayoutParams.height = windowH.toInt()
         }
 
         layoutParams = flLayoutParams

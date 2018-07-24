@@ -143,14 +143,8 @@ abstract class VideoPlayerLayout : FrameLayout, GestureDetector.OnGestureListene
                 updateSeek(delProgress)
             }
             BEHAVIOR_BRIGHTNESS -> {
-                if (Settings.System.getInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) === Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                    Settings.System.putInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE,
-                            Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
-                }
-
                 var progress = (mMaxBrightness * (distanceY / height) + mCurrentBrightness)
 
-                // 控制调节临界范围
                 if (progress <= 0) progress = 0f
                 if (progress >= mMaxBrightness) progress = mMaxBrightness
 
