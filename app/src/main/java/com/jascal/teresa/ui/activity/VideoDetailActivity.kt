@@ -52,7 +52,7 @@ class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
 
         mAdapter.setOnItemDetailClick {
             //TODO
-//            mPresenter.loadVideoInfo(it)
+            mPresenter.loadVideoInfo(it)
         }
 
         StatusBarUtil.immersive(this)

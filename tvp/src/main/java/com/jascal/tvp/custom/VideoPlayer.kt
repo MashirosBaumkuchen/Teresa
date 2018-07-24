@@ -84,6 +84,7 @@ class VideoPlayer : VideoPlayerLayout, SeekBar.OnSeekBarChangeListener {
     fun setData(uri: String) {
         this.mUri = uri
         mPlayer?.let {
+            it.reset()
             it.setDataSource(context, Uri.parse(mUri))
             it.prepareAsync()
             it.isLooping = true
