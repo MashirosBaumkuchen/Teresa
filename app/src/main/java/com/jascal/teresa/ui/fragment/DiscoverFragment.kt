@@ -35,7 +35,6 @@ class DiscoverFragment : BaseFragment(), DiscoverContract.View {
     private var isRefresh = false
     private var mMaterialHeader: MaterialHeader? = null
 
-    // 多种状态的 View 的切换
     protected var mLayoutStatusView: MultipleStatusView? = null
 
     companion object {
