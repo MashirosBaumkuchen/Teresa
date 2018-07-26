@@ -16,6 +16,8 @@ import java.util.ArrayList;
  * 创建时间: 2016/1/15 10:20.
  *
  * todo:2018/7/25: remove this class
+ *
+ * update todo
  */
 @SuppressWarnings("unused")
 public class MultipleStatusView extends RelativeLayout {
