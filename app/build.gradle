@@ -45,6 +45,12 @@ android {
     }
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'   // aar目录
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
@@ -96,4 +102,6 @@ dependencies {
 
     // --------  Banner  --------
     implementation 'cn.bingoogolapple:bga-banner:2.1.8@aar'
+
+    compile(name: 'picasso-2.71828', ext: 'aar')
 }

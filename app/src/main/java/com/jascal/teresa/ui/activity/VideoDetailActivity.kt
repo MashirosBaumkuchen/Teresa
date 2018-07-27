@@ -17,6 +17,7 @@ import com.jascal.teresa.utils.CleanLeakUtils
 import com.jascal.teresa.utils.Constants
 import com.jascal.teresa.utils.StatusBarUtil
 import com.jascal.teresa.utils.WatchHistoryUtils
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_video_detail.*
 import java.text.SimpleDateFormat
 import java.util.*
