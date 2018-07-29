@@ -27,6 +27,7 @@ import java.util.*
  * @author jascal
  * @time 2018/7/3
  * describe todo replace glide to picasso
+ *          todo a
  */
 class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
     companion object {
