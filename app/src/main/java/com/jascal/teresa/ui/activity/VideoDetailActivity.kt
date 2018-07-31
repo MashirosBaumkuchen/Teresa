@@ -29,6 +29,7 @@ import java.util.*
  * describe todo replace glide to picasso
  *          todo a
  *          todo a
+ *          todo a...
  */
 class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
     companion object {
