@@ -27,6 +27,7 @@ import java.util.*
  * @author jascal
  * @time 2018/7/3
  * todo
+ * todo
  */
 class VideoDetailActivity : BaseActivity(), VideoDetailContract.View {
     companion object {
