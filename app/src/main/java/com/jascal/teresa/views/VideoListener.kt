@@ -1,5 +1,7 @@
 //package com.jascal.teresa.views
 //
+
+// delete
 //import com.shuyu.gsyvideoplayer.listener.StandardVideoAllCallBack
 //
 ///**
