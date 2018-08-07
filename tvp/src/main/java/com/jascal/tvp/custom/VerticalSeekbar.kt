@@ -10,7 +10,7 @@ import com.jascal.tvp.utils.ResUtil
 /**
  * @author jascal
  * @time 2018/7/12
- * describe
+ * describe seekBar in videoPlayer
  */
 class VerticalSeekBar : View {
     private var mProgress = 0f
