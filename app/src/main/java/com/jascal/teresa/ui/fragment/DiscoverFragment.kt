@@ -25,6 +25,8 @@ import java.util.*
  * @author jascal
  * @time 2018/6/29
  * describe
+ * fresco
+ * 插件化+组件化+热修复
  */
 class DiscoverFragment : BaseFragment(), DiscoverContract.View {
     private val mPresenter by lazy { DiscoverPresenter() }
