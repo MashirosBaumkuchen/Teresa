@@ -28,6 +28,7 @@ import java.util.*
  * fresco
  * 插件化+组件化+热修复
  * ndk 底层
+ * 流畅性
  */
 class DiscoverFragment : BaseFragment(), DiscoverContract.View {
     private val mPresenter by lazy { DiscoverPresenter() }
