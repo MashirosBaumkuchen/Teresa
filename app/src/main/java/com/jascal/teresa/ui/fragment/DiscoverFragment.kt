@@ -30,6 +30,7 @@ import java.util.*
  * ndk 底层
  * 流畅性
  * jni rpc
+ * delay
  */
 class DiscoverFragment : BaseFragment(), DiscoverContract.View {
     private val mPresenter by lazy { DiscoverPresenter() }
