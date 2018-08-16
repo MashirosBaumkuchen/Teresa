@@ -31,6 +31,7 @@ import java.util.*
  * 流畅性
  * jni rpc
  * delay
+ * jsoup爬虫框架
  */
 class DiscoverFragment : BaseFragment(), DiscoverContract.View {
     private val mPresenter by lazy { DiscoverPresenter() }

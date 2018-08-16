@@ -104,4 +104,5 @@ dependencies {
     implementation 'cn.bingoogolapple:bga-banner:2.1.8@aar'
 
     compile(name: 'picasso-2.71828', ext: 'aar')
+
 }
