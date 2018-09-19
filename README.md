@@ -1,8 +1,3 @@
-# Teresa
+### Teresa
 
-an app based on android.
-
-&kotlin
-&rxjava
-&retrofit
-
+an Android videoPlayer based on SurfaceView and MediaPlayer
