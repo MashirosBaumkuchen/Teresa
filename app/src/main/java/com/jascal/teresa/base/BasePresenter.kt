@@ -29,7 +29,7 @@ open class BasePresenter<T : IView> : IPresenter<T> {
     }
 
     fun checkViewAttache() {
-        if (!isViewAttached) throw MvpViewNotAttachedException()
+        if (!isViewAttached) thr MvpViewNotAttachedException()
     }
 
     fun addSubscription(disposable: Disposable) {
